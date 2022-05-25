@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,8 @@ namespace BattleMonsters.Monster
         public int Attack { get => _baseAttack * Level; }
         public int Defense { get => _baseDefense * Level; }
         public int Health { get => _currentHealth; }
+
+        public Action OnLevelUp;
 
         private void Awake()
         {
@@ -50,6 +53,7 @@ namespace BattleMonsters.Monster
         {
             Level++;
             _maxHealth = _baseHealth * Level;
+            OnLevelUp.Invoke();
         }
     }
 }
