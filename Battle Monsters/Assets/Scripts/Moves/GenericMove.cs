@@ -4,8 +4,15 @@ using UnityEngine;
 
 namespace BattleMonsters.Moves
 {
-    public abstract class GenericMove
+    public class GenericMove
     {
-        public abstract void UseMove(Monster.MonsterStatManager target);
+        public MoveBase Base { get; set; }
+        public int Uses { get; set; }
+
+        public GenericMove(MoveBase moveBase)
+        {
+            Base = moveBase;
+            Uses = moveBase.Uses;
+        }
     }
 }

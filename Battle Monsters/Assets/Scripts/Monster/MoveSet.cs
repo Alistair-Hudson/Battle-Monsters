@@ -6,24 +6,24 @@ using UnityEngine;
 
 namespace BattleMonsters.Monster
 {
-    [RequireComponent(typeof(MonsterStatManager))]
+    [RequireComponent(typeof(MonsterBase))]
     public class MoveSet : MonoBehaviour
     {
         [Serializable]
         private struct MoveData
         {
             public int Level;
-            public GenericMove Move;
+            public MoveBase Move;
         }
 
         [SerializeField]
         private List<MoveData> _moveLearnSet = new List<MoveData>();
 
-        public List<GenericMove> KnownMoves { get; private set; }
+        public List<MoveBase> KnownMoves { get; private set; }
 
         private void Awake()
         {
-            GetComponent<MonsterStatManager>().OnLevelUp += OnLevelUp;
+            //GetComponent<MonsterBase>().OnLevelUp += OnLevelUp;
         }
 
         private void OnLevelUp(int level)
