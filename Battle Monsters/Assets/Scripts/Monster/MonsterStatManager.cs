@@ -25,7 +25,7 @@ namespace BattleMonsters.Monster
         public int Defense { get => _baseDefense * Level; }
         public int Health { get => _currentHealth; }
 
-        public Action OnLevelUp;
+        public Action<int> OnLevelUp;
 
         private void Awake()
         {
@@ -53,7 +53,7 @@ namespace BattleMonsters.Monster
         {
             Level++;
             _maxHealth = _baseHealth * Level;
-            OnLevelUp.Invoke();
+            OnLevelUp(Level);
         }
     }
 }
