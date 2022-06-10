@@ -66,5 +66,81 @@ namespace BattleMonsters.GamePlay.Combat
             _attackButtons.gameObject.SetActive(enable);
             _attackButtons.SetButtons(_playerUnit.Monster.KnownMoves);
         }
+
+        public void PerformAttack(int attackButtonIndex)
+        {
+            StartCoroutine(PerformPlayerAttack(attackButtonIndex));
+        }
+
+        private IEnumerator PerformPlayerAttack(int attackButtonIndex)
+        {
+            var attack = _playerUnit.Monster.KnownMoves[attackButtonIndex];
+            EnableAttacks(false);
+            EnableDialog(true);
+            _dialogBox.SetDialog($"{_playerUnit.Monster.Base.Species} used {attack.Base.MoveID}");
+            
+            yield return new WaitForSeconds(1f);
+
+            var damageDetails = _opponentUnit.Monster.RecieveDamage(attack, _playerUnit.Monster);
+            _opponentHUD.UpdateHealth();
+            yield return new WaitForSeconds(1f);
+
+            if (damageDetails.Critical)
+            {
+                _dialogBox.SetDialog($"Critical Hit!");
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.Effective != Monster.GenericMonster.DamageDetails.Effectiveness.Normal)
+            {
+                _dialogBox.SetDialog($"It was {damageDetails.Effective} effective");
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.IsKO)
+            {
+                _dialogBox.SetDialog($"{_opponentUnit.Monster.Base.Species} was knocked out");
+                yield return new WaitForSeconds(1f);
+            }
+            else
+            {
+                StartCoroutine(PerformEnemyAttack());
+            }
+        }
+
+        private IEnumerator PerformEnemyAttack()
+        {
+            var attack = _opponentUnit.Monster.KnownMoves[UnityEngine.Random.Range(0, _opponentUnit.Monster.KnownMoves.Count)];
+            _dialogBox.SetDialog($"{_opponentUnit.Monster.Base.Species} used {attack.Base.MoveID}");
+
+            yield return new WaitForSeconds(1f);
+
+            var damageDetails = _playerUnit.Monster.RecieveDamage(attack, _opponentUnit.Monster);
+            _playerHUD.UpdateHealth();
+            yield return new WaitForSeconds(1f);
+
+            if (damageDetails.Critical)
+            {
+                _dialogBox.SetDialog($"Critical Hit!");
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.Effective != Monster.GenericMonster.DamageDetails.Effectiveness.Normal)
+            {
+                _dialogBox.SetDialog($"It was {damageDetails.Effective} effective");
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.IsKO)
+            {
+                _dialogBox.SetDialog($"{_playerUnit.Monster.Base.Species} was knocked out");
+                yield return new WaitForSeconds(1f);
+            }
+            else
+            {
+                _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
+                EnableActions(true);
+            }
+        }
     }
 }
