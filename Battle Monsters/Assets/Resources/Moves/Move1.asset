@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28ba2a065dc02b246a97f6d9d959f562, type: 3}
   m_Name: Move1
   m_EditorClassIdentifier: 
-  _moveID: 
+  _moveID: Tackle
   _description: 
-  _type: 0
-  _power: 0
-  _accuracy: 0
-  _uses: 0
+  _type: 1
+  _power: 50
+  _accuracy: 100
+  _uses: 10
