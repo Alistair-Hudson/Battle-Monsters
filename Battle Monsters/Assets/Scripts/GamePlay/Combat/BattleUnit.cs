@@ -8,18 +8,14 @@ namespace BattleMonsters.GamePlay.Combat
     public class BattleUnit : MonoBehaviour
     {
         [SerializeField]
-        private MonsterBase _base;
-        [SerializeField]
-        private int _level;
-        [SerializeField]
         private bool _isPlayer;
 
         public GenericMonster Monster { get; set; }
 
-        public void Setup()
+        public void Setup(GenericMonster monster)
         {
-            Monster = new GenericMonster(_base, _level);
-            //Instanitae Mon
+            //Instanitate Mon
+            Monster = monster;
         }
     }
 }

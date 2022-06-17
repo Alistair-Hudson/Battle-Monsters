@@ -1,22 +1,26 @@
 using BattleMonsters.Moves;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace BattleMonsters.Monster
 {
+    [Serializable]
     public class GenericMonster
     {
-        public MonsterBase Base { get; set; }
-        public int Level { get; set; }
+        [SerializeField]
+        private MonsterBase _base;
+        [SerializeField]
+        private int _level;
+        public MonsterBase Base { get => _base;}
+        public int Level { get => _level;}
         
         public int CurrentHealth { get; set; }
         public List<Moves.GenericMove> KnownMoves { get; set; }
 
-        public GenericMonster(MonsterBase monsterBase, int level)
+        public void Init()
         {
-            Base = monsterBase;
-            Level = level;
             CurrentHealth = MaxHealth;
 
             KnownMoves = new List<Moves.GenericMove>();
@@ -42,12 +46,12 @@ namespace BattleMonsters.Monster
         {
             DamageDetails damageDetails = new DamageDetails();
             float typeModifier = Utils.TypeChart.GetEffectiveness(attack.Base.Type, Base.Type1) * Utils.TypeChart.GetEffectiveness(attack.Base.Type, Base.Type2);
-            float randomModifier = Random.Range(0.85f, 1f);
+            float randomModifier = UnityEngine.Random.Range(0.85f, 1f);
             float a = (2f * attacker.Level + 10f) / 250f;
             float d = a * attack.Base.Power * ((float)attacker.Attack / Defense) + 2f;
             int damage = Mathf.FloorToInt(d * randomModifier * typeModifier);
 
-            if (Random.value * 100f <= 6.25f)
+            if (UnityEngine.Random.value * 100f <= 6.25f)
             {
                 damage *= 2;
                 damageDetails.Critical = true;

@@ -1,3 +1,4 @@
+using BattleMonsters.Monster;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,16 +26,21 @@ namespace BattleMonsters.GamePlay.Combat
         [SerializeField]
         private AttackButtonsManager _attackButtons;
 
-        private void Start()
+        private Party _playerParty;
+        private GenericMonster _wildMon;
+
+        private void StartBattle(Party playerParty, GenericMonster wildMon)
         {
+            _playerParty = playerParty;
+            _wildMon = wildMon;
             StartCoroutine(SetUpBattle());
         }
 
         private IEnumerator SetUpBattle()
         {
-            _playerUnit.Setup();
+            _playerUnit.Setup(_playerParty.GetHealthyMon());
             _playerHUD.SetHUDData(_playerUnit.Monster);
-            _opponentUnit.Setup();
+            _opponentUnit.Setup(_wildMon);
             _opponentHUD.SetHUDData(_opponentUnit.Monster);
 
             _dialogBox.SetDialog($"A wild {_opponentUnit.Monster.Base.Species} appeard!");
@@ -101,6 +107,8 @@ namespace BattleMonsters.GamePlay.Combat
             {
                 _dialogBox.SetDialog($"{_opponentUnit.Monster.Base.Species} was knocked out");
                 yield return new WaitForSeconds(1f);
+
+                //exit batle
             }
             else
             {
@@ -135,6 +143,16 @@ namespace BattleMonsters.GamePlay.Combat
             {
                 _dialogBox.SetDialog($"{_playerUnit.Monster.Base.Species} was knocked out");
                 yield return new WaitForSeconds(1f);
+                var nextMon = _playerParty.GetHealthyMon();
+                if (nextMon != null)
+                {
+                    _playerUnit.Setup(nextMon);
+                    _playerHUD.SetHUDData(_playerUnit.Monster);
+                }
+                else
+                {
+                    //exit battle
+                }
             }
             else
             {
