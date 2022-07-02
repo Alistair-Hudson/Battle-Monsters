@@ -10,6 +10,8 @@ namespace BattleMonsters.Monster
         [SerializeField]
         List<GenericMonster> _party = new List<GenericMonster>();
 
+        public List<GenericMonster> PartyList { get => _party; }
+
         private void Start()
         {
             foreach (var mon in _party)

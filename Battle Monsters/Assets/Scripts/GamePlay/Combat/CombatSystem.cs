@@ -18,6 +18,8 @@ namespace BattleMonsters.GamePlay.Combat
         private HUD _opponentHUD;
         [SerializeField]
         private CombatDialog _dialogBox;
+        [SerializeField]
+        private PartyScreen _partyScreen;
 
         [SerializeField]
         private GameObject _dialogText;
@@ -26,8 +28,18 @@ namespace BattleMonsters.GamePlay.Combat
         [SerializeField]
         private AttackButtonsManager _attackButtons;
 
+        [SerializeField]
         private Party _playerParty;
+        [SerializeField]
         private GenericMonster _wildMon;
+
+        /// <summary>
+        /// TODO: Remove
+        /// </summary>
+        private void Start()
+        {
+            StartCoroutine(SetUpBattle());
+        }
 
         private void StartBattle(Party playerParty, GenericMonster wildMon)
         {
@@ -38,10 +50,17 @@ namespace BattleMonsters.GamePlay.Combat
 
         private IEnumerator SetUpBattle()
         {
+            //Set up HUDS
             _playerUnit.Setup(_playerParty.GetHealthyMon());
             _playerHUD.SetHUDData(_playerUnit.Monster);
             _opponentUnit.Setup(_wildMon);
             _opponentHUD.SetHUDData(_opponentUnit.Monster);
+
+            //Set Players party
+            _partyScreen.gameObject.SetActive(true);
+            _partyScreen.Init();
+            _partyScreen.SetPartyData(_playerParty.PartyList);
+            _partyScreen.gameObject.SetActive(false);
 
             _dialogBox.SetDialog($"A wild {_opponentUnit.Monster.Base.Species} appeard!");
             yield return new WaitForSeconds(1f);
