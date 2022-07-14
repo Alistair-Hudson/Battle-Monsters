@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BattleMonsters.GamePlay.Combat
 {
@@ -15,7 +16,7 @@ namespace BattleMonsters.GamePlay.Combat
             _partyMembers = GetComponentsInChildren<PartyMemberUI>();
         }
 
-        public void SetPartyData(List<GenericMonster> monsters)
+        public void SetPartyData(List<GenericMonster> monsters, GenericMonster activeMon)
         {
             for (int i = 0; i < _partyMembers.Length; i++)
             {
@@ -23,6 +24,18 @@ namespace BattleMonsters.GamePlay.Combat
                 {
                     _partyMembers[i].gameObject.SetActive(true);
                     _partyMembers[i].SetData(monsters[i]);
+                    if (monsters[i].CurrentHealth <= 0)
+                    {
+                        _partyMembers[i].GetComponent<Button>().interactable = false;
+                    }
+                    else if (monsters[i] == activeMon)
+                    {
+                        _partyMembers[i].GetComponent<Button>().interactable = false;
+                    }
+                    else
+                    {
+                        _partyMembers[i].GetComponent<Button>().interactable = true;
+                    }
                 }
                 else
                 {

@@ -51,6 +51,7 @@ namespace BattleMonsters.GamePlay.Combat
         private IEnumerator SetUpBattle()
         {
             //Set up HUDS
+            _wildMon.Init();
             _playerUnit.Setup(_playerParty.GetHealthyMon());
             _playerHUD.SetHUDData(_playerUnit.Monster);
             _opponentUnit.Setup(_wildMon);
@@ -59,13 +60,18 @@ namespace BattleMonsters.GamePlay.Combat
             //Set Players party
             _partyScreen.gameObject.SetActive(true);
             _partyScreen.Init();
-            _partyScreen.SetPartyData(_playerParty.PartyList);
             _partyScreen.gameObject.SetActive(false);
 
             _dialogBox.SetDialog($"A wild {_opponentUnit.Monster.Base.Species} appeard!");
             yield return new WaitForSeconds(1f);
             _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
             EnableActions(true);
+        }
+
+        public void OpenPartyScreen()
+        {
+            _partyScreen.SetPartyData(_playerParty.PartyList, _playerUnit.Monster);
+            _partyScreen.gameObject.SetActive(true);
         }
 
         public void CancelAttacks()
@@ -94,7 +100,22 @@ namespace BattleMonsters.GamePlay.Combat
 
         public void PerformAttack(int attackButtonIndex)
         {
-            StartCoroutine(PerformPlayerAttack(attackButtonIndex));
+            StartCoroutine(ExecuteBattleRound(attackButtonIndex));
+        }
+
+        private IEnumerator ExecuteBattleRound(int attackButtonIndex)
+        {
+            if (_playerUnit.Monster.Speed >= _opponentUnit.Monster.Speed)
+            {
+                yield return PerformPlayerAttack(attackButtonIndex);
+                yield return PerformEnemyAttack();
+
+            }
+            else
+            {
+                yield return PerformEnemyAttack();
+                yield return PerformPlayerAttack(attackButtonIndex);
+            }
         }
 
         private IEnumerator PerformPlayerAttack(int attackButtonIndex)
@@ -129,15 +150,13 @@ namespace BattleMonsters.GamePlay.Combat
 
                 //exit batle
             }
-            else
-            {
-                StartCoroutine(PerformEnemyAttack());
-            }
         }
 
         private IEnumerator PerformEnemyAttack()
         {
             var attack = _opponentUnit.Monster.KnownMoves[UnityEngine.Random.Range(0, _opponentUnit.Monster.KnownMoves.Count)];
+            EnableAttacks(false);
+            EnableDialog(true);
             _dialogBox.SetDialog($"{_opponentUnit.Monster.Base.Species} used {attack.Base.MoveID}");
 
             yield return new WaitForSeconds(1f);
@@ -165,8 +184,7 @@ namespace BattleMonsters.GamePlay.Combat
                 var nextMon = _playerParty.GetHealthyMon();
                 if (nextMon != null)
                 {
-                    _playerUnit.Setup(nextMon);
-                    _playerHUD.SetHUDData(_playerUnit.Monster);
+                    OpenPartyScreen();
                 }
                 else
                 {
@@ -177,6 +195,33 @@ namespace BattleMonsters.GamePlay.Combat
             {
                 _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
                 EnableActions(true);
+            }
+        }
+
+        public void CallSwitchMonster(int index)
+        {
+            StartCoroutine(SwitchMonster(index));
+        }
+
+        IEnumerator SwitchMonster(int monsterPartyIndex)
+        {
+            _partyScreen.gameObject.SetActive(false);
+            bool activeSwitch = false;
+            if (_playerUnit.Monster.CurrentHealth > 0)
+            {
+                _dialogBox.SetDialog($"return {_playerUnit.Monster.Base.Species}");
+                yield return new WaitForSeconds(1f);
+                activeSwitch = true;
+            }
+            var newMon = _playerParty.GetMonByIndex(monsterPartyIndex);
+            _dialogBox.SetDialog($"Go {newMon.Base.Species}!");
+            yield return new WaitForSeconds(1f);
+            _playerUnit.Setup(newMon);
+            _playerHUD.SetHUDData(_playerUnit.Monster);
+
+            if (activeSwitch)
+            {
+                StartCoroutine(PerformEnemyAttack());
             }
         }
     }

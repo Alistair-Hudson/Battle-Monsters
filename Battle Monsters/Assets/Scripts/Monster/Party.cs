@@ -24,5 +24,10 @@ namespace BattleMonsters.Monster
         {
             return _party.Where(x => x.CurrentHealth > 0).FirstOrDefault();
         }
+
+        public GenericMonster GetMonByIndex(int index)
+        {
+            return _party[index];
+        }
     }
 }
