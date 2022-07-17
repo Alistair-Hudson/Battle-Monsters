@@ -9,6 +9,7 @@ namespace BattleMonsters.GamePlay.Combat
     {
         [SerializeField]
         private bool _isPlayer;
+        public bool IsPlayer { get => _isPlayer; }
 
         public GenericMonster Monster { get; set; }
 

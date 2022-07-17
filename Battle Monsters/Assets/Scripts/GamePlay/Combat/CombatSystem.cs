@@ -1,4 +1,5 @@
 using BattleMonsters.Monster;
+using BattleMonsters.Moves;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ namespace BattleMonsters.GamePlay.Combat
         private Party _playerParty;
         [SerializeField]
         private GenericMonster _wildMon;
+
+        private bool _isPlayerFainted = false;
 
         /// <summary>
         /// TODO: Remove
@@ -114,55 +117,58 @@ namespace BattleMonsters.GamePlay.Combat
             else
             {
                 yield return PerformEnemyAttack();
-                yield return PerformPlayerAttack(attackButtonIndex);
+                if (!_isPlayerFainted)
+                {
+                    yield return PerformPlayerAttack(attackButtonIndex);
+                }
+                _isPlayerFainted = false;
             }
+
+            yield return EndofRoundEffects();
         }
 
         private IEnumerator PerformPlayerAttack(int attackButtonIndex)
         {
-            var attack = _playerUnit.Monster.KnownMoves[attackButtonIndex];
-            EnableAttacks(false);
-            EnableDialog(true);
-            _dialogBox.SetDialog($"{_playerUnit.Monster.Base.Species} used {attack.Base.MoveID}");
-            
-            yield return new WaitForSeconds(1f);
-
-            var damageDetails = _opponentUnit.Monster.RecieveDamage(attack, _playerUnit.Monster);
-            _opponentHUD.UpdateHealth();
-            yield return new WaitForSeconds(1f);
-
-            if (damageDetails.Critical)
-            {
-                _dialogBox.SetDialog($"Critical Hit!");
-                yield return new WaitForSeconds(1f);
-            }
-
-            if (damageDetails.Effective != Monster.GenericMonster.DamageDetails.Effectiveness.Normal)
-            {
-                _dialogBox.SetDialog($"It was {damageDetails.Effective} effective");
-                yield return new WaitForSeconds(1f);
-            }
-
-            if (damageDetails.IsKO)
-            {
-                _dialogBox.SetDialog($"{_opponentUnit.Monster.Base.Species} was knocked out");
-                yield return new WaitForSeconds(1f);
-
-                //exit batle
-            }
+            GenericMove attack = _playerUnit.Monster.KnownMoves[attackButtonIndex];
+            yield return PerformAttack(_playerUnit, _opponentUnit, attack);
         }
 
         private IEnumerator PerformEnemyAttack()
         {
-            var attack = _opponentUnit.Monster.KnownMoves[UnityEngine.Random.Range(0, _opponentUnit.Monster.KnownMoves.Count)];
+            GenericMove attack = _opponentUnit.Monster.KnownMoves[UnityEngine.Random.Range(0, _opponentUnit.Monster.KnownMoves.Count)];
+            yield return PerformAttack(_opponentUnit, _playerUnit, attack);
+        }
+
+        private IEnumerator PerformAttack(BattleUnit sourceUnit, BattleUnit targetUnit, GenericMove attack)
+        {
             EnableAttacks(false);
             EnableDialog(true);
-            _dialogBox.SetDialog($"{_opponentUnit.Monster.Base.Species} used {attack.Base.MoveID}");
+            //if Asleep
+                //try awake
+                //if still asleep
+                    //"is asleep"
+                    //wakeup chance increase
+                    //exit
+                //else
+                    //"wokeup"
+
+            //if frozen
+                //try unfreeze
+                //if still frozen
+                    //"is frozen"
+                    //exit
+                //else
+                    //"unfroze"
+
+            attack.Uses--;
+            _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} used {attack.Base.MoveID}");
 
             yield return new WaitForSeconds(1f);
 
-            var damageDetails = _playerUnit.Monster.RecieveDamage(attack, _opponentUnit.Monster);
+            var damageDetails = targetUnit.Monster.RecieveDamage(attack, sourceUnit.Monster);
             _playerHUD.UpdateHealth();
+            _opponentHUD.UpdateHealth();
+
             yield return new WaitForSeconds(1f);
 
             if (damageDetails.Critical)
@@ -171,7 +177,7 @@ namespace BattleMonsters.GamePlay.Combat
                 yield return new WaitForSeconds(1f);
             }
 
-            if (damageDetails.Effective != Monster.GenericMonster.DamageDetails.Effectiveness.Normal)
+            if (damageDetails.Effective != GenericMonster.DamageDetails.Effectiveness.Normal)
             {
                 _dialogBox.SetDialog($"It was {damageDetails.Effective} effective");
                 yield return new WaitForSeconds(1f);
@@ -179,23 +185,26 @@ namespace BattleMonsters.GamePlay.Combat
 
             if (damageDetails.IsKO)
             {
-                _dialogBox.SetDialog($"{_playerUnit.Monster.Base.Species} was knocked out");
+                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} was knocked out");
                 yield return new WaitForSeconds(1f);
+
+                ExecuteTargetFainted(targetUnit);
+            }
+        }
+
+        private void ExecuteTargetFainted(BattleUnit targetUnit)
+        {
+            if (targetUnit.IsPlayer)
+            {
                 var nextMon = _playerParty.GetHealthyMon();
                 if (nextMon != null)
                 {
                     OpenPartyScreen();
-                }
-                else
-                {
-                    //exit battle
+                    _isPlayerFainted = true;
                 }
             }
-            else
-            {
-                _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
-                EnableActions(true);
-            }
+
+            //exit battle
         }
 
         public void CallSwitchMonster(int index)
@@ -221,8 +230,33 @@ namespace BattleMonsters.GamePlay.Combat
 
             if (activeSwitch)
             {
-                StartCoroutine(PerformEnemyAttack());
+                yield return PerformEnemyAttack();
             }
+
+            yield return EndofRoundEffects();
+        }
+
+        private IEnumerator EndofRoundEffects()
+        {
+            if ((_playerUnit.Monster.Speed >= _opponentUnit.Monster.Speed))
+            {
+                yield return ApplyStatusEffects(_playerUnit);
+                yield return ApplyStatusEffects(_opponentUnit);
+            }
+            else
+            {
+                yield return ApplyStatusEffects(_opponentUnit);
+                yield return ApplyStatusEffects(_playerUnit);
+            }
+            //Weathereffects
+            _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
+            EnableActions(true);
+            yield return new WaitForSeconds(1f);
+        }
+
+        private IEnumerator ApplyStatusEffects(BattleUnit unit)
+        {
+            yield return null;
         }
     }
 }
