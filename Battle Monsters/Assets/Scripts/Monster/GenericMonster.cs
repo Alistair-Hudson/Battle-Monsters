@@ -61,9 +61,9 @@ namespace BattleMonsters.Monster
         public int Speed { get => CurrentStats[Stat.Speed]; }
         public int MaxHealth { get; private set; }
 
-        public DamageDetails RecieveAttack(GenericMove attack, GenericMonster attacker)
+        public MoveResults RecieveAttack(GenericMove attack, GenericMonster attacker)
         {
-            DamageDetails damageDetails = new DamageDetails();
+            MoveResults damageDetails = new MoveResults();
             damageDetails.StatsAffected = new Dictionary<Stat, int>();
             SetDamageDetails(attack, attacker, damageDetails);
 
@@ -75,12 +75,12 @@ namespace BattleMonsters.Monster
             return damageDetails;
         }
 
-        private void SetDamageDetails(GenericMove attack, GenericMonster attacker, DamageDetails damageDetails)
+        private void SetDamageDetails(GenericMove attack, GenericMonster attacker, MoveResults damageDetails)
         {
-            float typeModifier = TypeChart.GetEffectiveness(attack.Base.Type, Base.Type1) * Utils.TypeChart.GetEffectiveness(attack.Base.Type, Base.Type2);
+            float typeModifier = TypeChart.GetEffectiveness(attack.Base.Type, Base.Type1) * TypeChart.GetEffectiveness(attack.Base.Type, Base.Type2);
             float randomModifier = UnityEngine.Random.Range(0.85f, 1f);
             float a = (2f * attacker.Level + 10f) / 250f;
-            float d = a * attack.Base.Power * ((float)attacker.Attack / Defense) + 2f;
+            float d = a * attack.Base.Power * ((float)attacker.CurrentStats[Stat.Attack] / CurrentStats[Stat.Defense]) + 2f;
             int damage = Mathf.FloorToInt(d * randomModifier * typeModifier);
 
             if (UnityEngine.Random.value * 100f <= 6.25f)
@@ -98,15 +98,15 @@ namespace BattleMonsters.Monster
 
             if (typeModifier > 1)
             {
-                damageDetails.Effective = DamageDetails.Effectiveness.Super;
+                damageDetails.Effective = MoveResults.Effectiveness.Super;
             }
             else if (typeModifier < 1)
             {
-                damageDetails.Effective = DamageDetails.Effectiveness.Not;
+                damageDetails.Effective = MoveResults.Effectiveness.Not;
             }
         }
 
-        private void ApplyEffects(MoveEffects effects, DamageDetails damageDetails)
+        private void ApplyEffects(MoveEffects effects, MoveResults damageDetails)
         {
             foreach (var statMod in effects.StatEffects)
             {
@@ -125,7 +125,7 @@ namespace BattleMonsters.Monster
             }
         }
 
-        public class DamageDetails
+        public class MoveResults
         {
             public enum Effectiveness
             {

@@ -167,7 +167,7 @@ namespace BattleMonsters.GamePlay.Combat
 
             yield return new WaitForSeconds(1f);
 
-            DamageDetails damageDetails = new DamageDetails();
+            MoveResults damageDetails = new MoveResults();
             switch (attack.Base.Target)
             {
                 case MoveTarget.Enemy:
@@ -191,7 +191,7 @@ namespace BattleMonsters.GamePlay.Combat
                 yield return new WaitForSeconds(1f);
             }
 
-            if (damageDetails.Effective != GenericMonster.DamageDetails.Effectiveness.Normal)
+            if (damageDetails.Effective != MoveResults.Effectiveness.Normal)
             {
                 _dialogBox.SetDialog($"It was {damageDetails.Effective} effective");
                 yield return new WaitForSeconds(1f);
