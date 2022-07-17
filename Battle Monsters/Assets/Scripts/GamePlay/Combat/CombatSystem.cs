@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static BattleMonsters.Monster.GenericMonster;
 
 namespace BattleMonsters.GamePlay.Combat
 {
@@ -143,6 +144,7 @@ namespace BattleMonsters.GamePlay.Combat
         {
             EnableAttacks(false);
             EnableDialog(true);
+
             //if Asleep
                 //try awake
                 //if still asleep
@@ -165,7 +167,19 @@ namespace BattleMonsters.GamePlay.Combat
 
             yield return new WaitForSeconds(1f);
 
-            var damageDetails = targetUnit.Monster.RecieveDamage(attack, sourceUnit.Monster);
+            DamageDetails damageDetails = new DamageDetails();
+            switch (attack.Base.Target)
+            {
+                case MoveTarget.Enemy:
+                    damageDetails = targetUnit.Monster.RecieveAttack(attack, sourceUnit.Monster);
+                    break;
+                case MoveTarget.Self:
+                    damageDetails = targetUnit.Monster.RecieveAttack(attack, sourceUnit.Monster);
+                    break;
+                default:
+                    break;
+            }
+
             _playerHUD.UpdateHealth();
             _opponentHUD.UpdateHealth();
 
@@ -189,6 +203,23 @@ namespace BattleMonsters.GamePlay.Combat
                 yield return new WaitForSeconds(1f);
 
                 ExecuteTargetFainted(targetUnit);
+            }
+
+            foreach (var stat in damageDetails.StatsAffected)
+            {
+                switch (stat.Value)
+                {
+                    case -1:
+                        _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species}'s {stat.Key} was lowered");
+                        yield return new WaitForSeconds(1f);
+                        break;
+                    case 1:
+                        _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species}'s {stat.Key} was raised");
+                        yield return new WaitForSeconds(1f);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

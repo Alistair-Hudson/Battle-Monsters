@@ -38,6 +38,7 @@ namespace BattleMonsters.Monster
         public int Defense { get => _baseDefense; }
         public int MaxHealth { get => _maxHealth; }
         public List<LearnableMove> LearnableMoves { get => _learnableMoves; }
+
     }
 
     [Serializable]
