@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44402242, g: 0.49316543, b: 0.5722324, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2373,7 +2373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cc00365d3274ba4e816680c2a04486a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isPlayer: 1
+  _isPlayer: 0
 --- !u!4 &995046704
 Transform:
   m_ObjectHideFlags: 0
@@ -2627,8 +2627,10 @@ MonoBehaviour:
   _party:
   - _base: {fileID: 11400000, guid: 754e3ff9c039d0a4bbe516abc2140b4f, type: 2}
     _level: 10
+    PermanentCondition: 0
   - _base: {fileID: 11400000, guid: ce689a7abbc623f4ab32beb83af9b1ac, type: 2}
     _level: 3
+    PermanentCondition: 0
 --- !u!4 &1026864753
 Transform:
   m_ObjectHideFlags: 0
@@ -2839,6 +2841,9 @@ MonoBehaviour:
   _wildMon:
     _base: {fileID: 11400000, guid: 754e3ff9c039d0a4bbe516abc2140b4f, type: 2}
     _level: 5
+    PermanentCondition: 0
+  _thawChance: 0.2
+  _paralyzeOvercomeChance: 0.25
 --- !u!1 &1154789852
 GameObject:
   m_ObjectHideFlags: 0
@@ -5580,10 +5585,10 @@ RectTransform:
   m_Father: {fileID: 1213717917}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1250, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 645, y: -152.5}
+  m_SizeDelta: {x: 1250, y: 295}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2013869025
 MonoBehaviour:
