@@ -1,5 +1,6 @@
 using BattleMonsters.Monster;
 using BattleMonsters.Moves;
+using BattleMonsters.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,10 +36,17 @@ namespace BattleMonsters.GamePlay.Combat
         [SerializeField]
         private GenericMonster _wildMon;
 
+        [SerializeField]
+        private float _thawChance = 0.2f;
+        [SerializeField]
+        private float _paralyzeOvercomeChance = 0.25f;
+
         private bool _isPlayerFainted = false;
 
         private Utils.WeatherCondition _weatherCondition = Utils.WeatherCondition.None;
         private int _weatherCountdown = 0;
+
+        private PriorityQueue<BattleUnit> _priorityQueue = new PriorityQueue<BattleUnit>(false);
 
         /// <summary>
         /// TODO: Remove
@@ -112,21 +120,27 @@ namespace BattleMonsters.GamePlay.Combat
 
         private IEnumerator ExecuteBattleRound(int attackButtonIndex)
         {
-            if (_playerUnit.Monster.Speed >= _opponentUnit.Monster.Speed)
-            {
-                yield return PerformPlayerAttack(attackButtonIndex);
-                yield return PerformEnemyAttack();
+            _priorityQueue.Enqueue(_playerUnit.Monster.Speed, _playerUnit);
+            _priorityQueue.Enqueue(_opponentUnit.Monster.Speed, _opponentUnit);
 
-            }
-            else
+            while (_priorityQueue.Count > 0)
             {
-                yield return PerformEnemyAttack();
-                if (!_isPlayerFainted)
+                BattleUnit unit = _priorityQueue.Dequeue();
+                if (unit.IsPlayer)
                 {
                     yield return PerformPlayerAttack(attackButtonIndex);
                 }
-                _isPlayerFainted = false;
+                else
+                {
+                    yield return PerformEnemyAttack();
+                    if (_isPlayerFainted)
+                    {
+                        _priorityQueue.Clear();
+                        break;
+                    }
+                }
             }
+            _isPlayerFainted = false;
 
             yield return EndofRoundEffects();
         }
@@ -148,22 +162,11 @@ namespace BattleMonsters.GamePlay.Combat
             EnableAttacks(false);
             EnableDialog(true);
 
-            //if Asleep
-                //try awake
-                //if still asleep
-                    //"is asleep"
-                    //wakeup chance increase
-                    //exit
-                //else
-                    //"wokeup"
-
-            //if frozen
-                //try unfreeze
-                //if still frozen
-                    //"is frozen"
-                    //exit
-                //else
-                    //"unfroze"
+            if (StatusConditionAffecting(sourceUnit))
+            {
+                yield return new WaitForSeconds(1f);
+                yield break;
+            }
 
             attack.Uses--;
             _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} used {attack.Base.MoveID}");
@@ -232,6 +235,67 @@ namespace BattleMonsters.GamePlay.Combat
             }
         }
 
+        private bool StatusConditionAffecting(BattleUnit sourceUnit)
+        {
+            bool isAbleToAttack = false;
+            switch (sourceUnit.Monster.PermanentCondition)
+            {
+                case Utils.PermanentCondition.Asleep:
+                    isAbleToAttack = CheckSleepStatus(sourceUnit);
+                    break;
+                case Utils.PermanentCondition.Frozen:
+                    isAbleToAttack = CheckFrozenStatus(sourceUnit);
+                    break;
+                case Utils.PermanentCondition.Paralyzed:
+                    isAbleToAttack = CheckParalyzeStatus(sourceUnit);
+                    break;
+                default:
+                    break;
+            }
+
+            return isAbleToAttack;
+        }
+
+        private bool CheckFrozenStatus(BattleUnit sourceUnit)
+        {
+            if (UnityEngine.Random.Range(0, 1) <= _thawChance)
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} thawed out");
+                sourceUnit.Monster.PermanentCondition = Utils.PermanentCondition.None;
+                return true;
+            }
+            else
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is still frozen");
+                return false;
+            }
+        }
+
+        private bool CheckParalyzeStatus(BattleUnit sourceUnit)
+        {
+            if (UnityEngine.Random.Range(0, 1) > _paralyzeOvercomeChance)
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is unable to move");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool CheckSleepStatus(BattleUnit sourceUnit)
+        {
+            if (sourceUnit.Monster.SleepCount-- <= 0)
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} woke up");
+                return true;
+            }
+            else
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is fast asleep");
+                return false;
+            }
+        }
+
         private void ExecuteTargetFainted(BattleUnit targetUnit)
         {
             if (targetUnit.IsPlayer)
@@ -278,15 +342,20 @@ namespace BattleMonsters.GamePlay.Combat
 
         private IEnumerator EndofRoundEffects()
         {
-            if ((_playerUnit.Monster.Speed >= _opponentUnit.Monster.Speed))
+            _priorityQueue.Enqueue(_playerUnit.Monster.Speed, _playerUnit);
+            _priorityQueue.Enqueue(_opponentUnit.Monster.Speed, _opponentUnit);
+
+            while (_priorityQueue.Count > 0)
             {
-                yield return ApplyStatusEffects(_playerUnit);
-                yield return ApplyStatusEffects(_opponentUnit);
-            }
-            else
-            {
-                yield return ApplyStatusEffects(_opponentUnit);
-                yield return ApplyStatusEffects(_playerUnit);
+                BattleUnit unit = _priorityQueue.Dequeue();
+                if (unit.IsPlayer)
+                {
+                    yield return ApplyStatusEffects(_playerUnit);
+                }
+                else
+                {
+                    yield return ApplyStatusEffects(_opponentUnit);
+                }
             }
             yield return ApplyWeather();
             _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");

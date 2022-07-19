@@ -6,7 +6,8 @@ namespace BattleMonsters.Utils
         Asleep,
         Poisoned,
         Frozen,
-        Burnt
+        Burnt,
+        Paralyzed
     }
 
     public enum TemporaryCondition

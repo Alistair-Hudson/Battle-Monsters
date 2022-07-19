@@ -23,6 +23,7 @@ namespace BattleMonsters.Monster
         public Dictionary<Stat, int> CurrentStats { get; private set; }
         public Dictionary<Stat, int> StatModifiers { get; private set; }
         public PermanentCondition PermanentCondition;
+        public int SleepCount { get; set; }
 
         public void Init()
         {
@@ -57,9 +58,9 @@ namespace BattleMonsters.Monster
             StatModifiers.Add(Stat.Speed, 0);
         }
 
-        public int Attack { get => CurrentStats[Stat.Attack]; }
+        public int Attack { get => PermanentCondition == PermanentCondition.Burnt ? Mathf.FloorToInt(CurrentStats[Stat.Attack] / 2) : CurrentStats[Stat.Attack]; }
         public int Defense { get => CurrentStats[Stat.Defense]; }
-        public int Speed { get => CurrentStats[Stat.Speed]; }
+        public int Speed { get => PermanentCondition == PermanentCondition.Paralyzed ? Mathf.FloorToInt(CurrentStats[Stat.Speed] / 2) : CurrentStats[Stat.Speed]; }
         public int MaxHealth { get; private set; }
 
         public MoveResults RecieveAttack(GenericMove attack, GenericMonster attacker)
