@@ -38,8 +38,17 @@ namespace BattleMonsters.Moves
 [System.Serializable]
 public class MoveEffects
 {
-    [SerializeField] private List<StatEffect> _statEffects;
-    public List<StatEffect> StatEffects { get => _statEffects; }
+    [SerializeField]
+    private List<StatEffect> _targetStatEffects;
+    public List<StatEffect> TargetStatEffects { get => _targetStatEffects; }
+    [SerializeField]
+    private List<StatEffect> _userStatEffects;
+    public List<StatEffect> UserStatEffects { get => _userStatEffects; }
+    public PermanentCondition TargetPermCondition;
+    public PermanentCondition UserPermCondition;
+    public TemporaryCondition TargetTempCondition;
+    public TemporaryCondition UserTempCondition;
+    public WeatherCondition WeatherCondition;
 }
 
 [System.Serializable]

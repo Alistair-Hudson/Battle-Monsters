@@ -37,6 +37,9 @@ namespace BattleMonsters.GamePlay.Combat
 
         private bool _isPlayerFainted = false;
 
+        private Utils.WeatherCondition _weatherCondition = Utils.WeatherCondition.None;
+        private int _weatherCountdown = 0;
+
         /// <summary>
         /// TODO: Remove
         /// </summary>
@@ -205,7 +208,7 @@ namespace BattleMonsters.GamePlay.Combat
                 ExecuteTargetFainted(targetUnit);
             }
 
-            foreach (var stat in damageDetails.StatsAffected)
+            foreach (var stat in damageDetails.TargetStatsAffected)
             {
                 switch (stat.Value)
                 {
@@ -220,6 +223,12 @@ namespace BattleMonsters.GamePlay.Combat
                     default:
                         break;
                 }
+            }
+
+            if (damageDetails.WeatherCondition != Utils.WeatherCondition.None && damageDetails.WeatherCondition != _weatherCondition)
+            {
+                _weatherCondition = damageDetails.WeatherCondition;
+                _weatherCountdown = 5;
             }
         }
 
@@ -279,7 +288,7 @@ namespace BattleMonsters.GamePlay.Combat
                 yield return ApplyStatusEffects(_opponentUnit);
                 yield return ApplyStatusEffects(_playerUnit);
             }
-            //Weathereffects
+            yield return ApplyWeather();
             _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
             EnableActions(true);
             yield return new WaitForSeconds(1f);
@@ -287,6 +296,25 @@ namespace BattleMonsters.GamePlay.Combat
 
         private IEnumerator ApplyStatusEffects(BattleUnit unit)
         {
+            yield return null;
+        }
+
+        private IEnumerator ApplyWeather()
+        {
+            switch (_weatherCondition)
+            {
+                case Utils.WeatherCondition.Hail:
+                    break;
+                case Utils.WeatherCondition.SandStorm:
+                    break;
+                default:
+                    break;
+            }
+            _weatherCountdown--;
+            if (_weatherCountdown <= 0)
+            {
+                _weatherCondition = Utils.WeatherCondition.None;
+            }
             yield return null;
         }
     }

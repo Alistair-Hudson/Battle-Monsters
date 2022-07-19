@@ -22,6 +22,7 @@ namespace BattleMonsters.Monster
         public Dictionary<Stat, int> BaseStats { get; private set; }
         public Dictionary<Stat, int> CurrentStats { get; private set; }
         public Dictionary<Stat, int> StatModifiers { get; private set; }
+        public PermanentCondition PermanentCondition;
 
         public void Init()
         {
@@ -64,7 +65,7 @@ namespace BattleMonsters.Monster
         public MoveResults RecieveAttack(GenericMove attack, GenericMonster attacker)
         {
             MoveResults damageDetails = new MoveResults();
-            damageDetails.StatsAffected = new Dictionary<Stat, int>();
+            damageDetails.TargetStatsAffected = new Dictionary<Stat, int>();
             SetDamageDetails(attack, attacker, damageDetails);
 
             if (!damageDetails.IsKO)
@@ -80,7 +81,7 @@ namespace BattleMonsters.Monster
             float typeModifier = TypeChart.GetEffectiveness(attack.Base.Type, Base.Type1) * TypeChart.GetEffectiveness(attack.Base.Type, Base.Type2);
             float randomModifier = UnityEngine.Random.Range(0.85f, 1f);
             float a = (2f * attacker.Level + 10f) / 250f;
-            float d = a * attack.Base.Power * ((float)attacker.CurrentStats[Stat.Attack] / CurrentStats[Stat.Defense]) + 2f;
+            float d = a * attack.Base.Power * ((float)attacker.Attack / Defense) + 2f;
             int damage = Mathf.FloorToInt(d * randomModifier * typeModifier);
 
             if (UnityEngine.Random.value * 100f <= 6.25f)
@@ -108,19 +109,19 @@ namespace BattleMonsters.Monster
 
         private void ApplyEffects(MoveEffects effects, MoveResults damageDetails)
         {
-            foreach (var statMod in effects.StatEffects)
+            foreach (var statMod in effects.TargetStatEffects)
             {
                 StatModifiers[statMod.Stat] = Mathf.Clamp(StatModifiers[statMod.Stat] + statMod.Modifier, -6, 6);
                 float modifier = 0.5f * StatModifiers[statMod.Stat] + 1f;
                 if (modifier < 0)
                 {
                     CurrentStats[statMod.Stat] = Mathf.FloorToInt(BaseStats[statMod.Stat] / -modifier);
-                    damageDetails.StatsAffected.Add(statMod.Stat, -1);
+                    damageDetails.TargetStatsAffected.Add(statMod.Stat, -1);
                 }
                 else if (modifier > 0)
                 {
                     CurrentStats[statMod.Stat] = Mathf.FloorToInt(BaseStats[statMod.Stat] * modifier);
-                    damageDetails.StatsAffected.Add(statMod.Stat, 1);
+                    damageDetails.TargetStatsAffected.Add(statMod.Stat, 1);
                 }
             }
         }
@@ -136,7 +137,8 @@ namespace BattleMonsters.Monster
             public bool IsKO { get; set; }
             public Effectiveness Effective { get; set; }
             public bool Critical { get; set; }
-            public Dictionary<Stat, int> StatsAffected { get; set; }
+            public Dictionary<Stat, int> TargetStatsAffected { get; set; }
+            public WeatherCondition WeatherCondition;
         }
     }
 }
