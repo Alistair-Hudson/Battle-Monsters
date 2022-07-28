@@ -43,7 +43,7 @@ namespace BattleMonsters.GamePlay.Combat
 
         private bool _isPlayerFainted = false;
 
-        private Utils.WeatherCondition _weatherCondition = Utils.WeatherCondition.None;
+        private Utils.Conditions.WeatherCondition _weatherCondition = Utils.Conditions.WeatherCondition.None;
         private int _weatherCountdown = 0;
 
         private PriorityQueue<BattleUnit> _priorityQueue = new PriorityQueue<BattleUnit>(false);
@@ -162,7 +162,7 @@ namespace BattleMonsters.GamePlay.Combat
             EnableAttacks(false);
             EnableDialog(true);
 
-            if (StatusConditionAffecting(sourceUnit))
+            if (!IsAbleToAttack(sourceUnit))
             {
                 yield return new WaitForSeconds(1f);
                 yield break;
@@ -209,44 +209,57 @@ namespace BattleMonsters.GamePlay.Combat
                 yield return new WaitForSeconds(1f);
 
                 ExecuteTargetFainted(targetUnit);
+                yield break;
             }
 
-            foreach (var stat in damageDetails.TargetStatsAffected)
+            yield return RunStatusAffects(targetUnit, damageDetails);
+            yield return RunStatusAffects(sourceUnit, damageDetails);
+
+            if (damageDetails.TargetPermCondition != Conditions.PermanentCondition.None)
             {
-                switch (stat.Value)
-                {
-                    case -1:
-                        _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species}'s {stat.Key} was lowered");
-                        yield return new WaitForSeconds(1f);
-                        break;
-                    case 1:
-                        _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species}'s {stat.Key} was raised");
-                        yield return new WaitForSeconds(1f);
-                        break;
-                    default:
-                        break;
-                }
+                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {damageDetails.TargetPermCondition}");
+                (targetUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[damageDetails.TargetPermCondition]);
+                yield return new WaitForSeconds(1f);
             }
 
-            if (damageDetails.WeatherCondition != Utils.WeatherCondition.None && damageDetails.WeatherCondition != _weatherCondition)
+            if (damageDetails.UserPermCondition != Conditions.PermanentCondition.None)
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {damageDetails.UserPermCondition}");
+                (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[damageDetails.TargetPermCondition]);
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.TargetTempCondition != Conditions.TemporaryCondition.None)
+            {
+                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {damageDetails.TargetTempCondition}");
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.UserTempCondition != Conditions.TemporaryCondition.None)
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {damageDetails.UserTempCondition}");
+                yield return new WaitForSeconds(1f);
+            }
+
+            if (damageDetails.WeatherCondition != Utils.Conditions.WeatherCondition.None && damageDetails.WeatherCondition != _weatherCondition)
             {
                 _weatherCondition = damageDetails.WeatherCondition;
                 _weatherCountdown = 5;
             }
         }
 
-        private bool StatusConditionAffecting(BattleUnit sourceUnit)
+        private bool IsAbleToAttack(BattleUnit sourceUnit)
         {
-            bool isAbleToAttack = false;
+            bool isAbleToAttack = true;
             switch (sourceUnit.Monster.PermanentCondition)
             {
-                case Utils.PermanentCondition.Asleep:
+                case Utils.Conditions.PermanentCondition.Asleep:
                     isAbleToAttack = CheckSleepStatus(sourceUnit);
                     break;
-                case Utils.PermanentCondition.Frozen:
+                case Utils.Conditions.PermanentCondition.Frozen:
                     isAbleToAttack = CheckFrozenStatus(sourceUnit);
                     break;
-                case Utils.PermanentCondition.Paralyzed:
+                case Utils.Conditions.PermanentCondition.Paralyzed:
                     isAbleToAttack = CheckParalyzeStatus(sourceUnit);
                     break;
                 default:
@@ -261,7 +274,8 @@ namespace BattleMonsters.GamePlay.Combat
             if (UnityEngine.Random.Range(0, 1) <= _thawChance)
             {
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} thawed out");
-                sourceUnit.Monster.PermanentCondition = Utils.PermanentCondition.None;
+                sourceUnit.Monster.PermanentCondition = Utils.Conditions.PermanentCondition.None;
+                (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[Conditions.PermanentCondition.None]);
                 return true;
             }
             else
@@ -287,6 +301,7 @@ namespace BattleMonsters.GamePlay.Combat
             if (sourceUnit.Monster.SleepCount-- <= 0)
             {
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} woke up");
+                (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[Conditions.PermanentCondition.None]);
                 return true;
             }
             else
@@ -350,11 +365,11 @@ namespace BattleMonsters.GamePlay.Combat
                 BattleUnit unit = _priorityQueue.Dequeue();
                 if (unit.IsPlayer)
                 {
-                    yield return ApplyStatusEffects(_playerUnit);
+                    yield return ApplyStatusConditions(_playerUnit);
                 }
                 else
                 {
-                    yield return ApplyStatusEffects(_opponentUnit);
+                    yield return ApplyStatusConditions(_opponentUnit);
                 }
             }
             yield return ApplyWeather();
@@ -363,18 +378,38 @@ namespace BattleMonsters.GamePlay.Combat
             yield return new WaitForSeconds(1f);
         }
 
-        private IEnumerator ApplyStatusEffects(BattleUnit unit)
+        private IEnumerator ApplyStatusConditions(BattleUnit unit)
         {
-            yield return null;
+            bool isKO = false;
+            switch (unit.Monster.PermanentCondition)
+            {
+                case Conditions.PermanentCondition.Poisoned:
+                    isKO = unit.Monster.ReceiveConditionalDamage(Mathf.FloorToInt(unit.Monster.MaxHealth / 8f));
+                    _dialogBox.SetDialog($"{unit.Monster.Base.Species} was hurt by the poison");
+                    yield return new WaitForSeconds(1f);
+                    break;
+                case Conditions.PermanentCondition.Burnt:
+                    isKO = unit.Monster.ReceiveConditionalDamage(Mathf.FloorToInt(unit.Monster.MaxHealth / 16f));
+                    _dialogBox.SetDialog($"{unit.Monster.Base.Species} was hurt by the burn");
+                    yield return new WaitForSeconds(1f);
+                    break;
+                default:
+                    break;
+            }
+            (unit.IsPlayer ? _playerHUD : _opponentHUD).UpdateHealth();
+            if (isKO)
+            {
+                ExecuteTargetFainted(unit);
+            }
         }
 
         private IEnumerator ApplyWeather()
         {
             switch (_weatherCondition)
             {
-                case Utils.WeatherCondition.Hail:
+                case Utils.Conditions.WeatherCondition.Hail:
                     break;
-                case Utils.WeatherCondition.SandStorm:
+                case Utils.Conditions.WeatherCondition.SandStorm:
                     break;
                 default:
                     break;
@@ -382,9 +417,29 @@ namespace BattleMonsters.GamePlay.Combat
             _weatherCountdown--;
             if (_weatherCountdown <= 0)
             {
-                _weatherCondition = Utils.WeatherCondition.None;
+                _weatherCondition = Utils.Conditions.WeatherCondition.None;
             }
             yield return null;
+        }
+
+        private IEnumerator RunStatusAffects(BattleUnit unit, MoveResults moveResults)
+        {
+            foreach (var stat in moveResults.TargetStatsAffected)
+            {
+                switch (stat.Value)
+                {
+                    case -1:
+                        _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Key} was lowered");
+                        yield return new WaitForSeconds(1f);
+                        break;
+                    case 1:
+                        _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Key} was raised");
+                        yield return new WaitForSeconds(1f);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

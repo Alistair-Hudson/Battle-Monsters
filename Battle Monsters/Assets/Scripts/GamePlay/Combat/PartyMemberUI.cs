@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BattleMonsters.GamePlay.Combat
 {
@@ -13,6 +14,8 @@ namespace BattleMonsters.GamePlay.Combat
         private TMP_Text _level;
         [SerializeField]
         private HealthBar _health;
+        [SerializeField]
+        private Image _statusCondition;
 
         private Monster.GenericMonster _monster;
 
@@ -22,6 +25,12 @@ namespace BattleMonsters.GamePlay.Combat
             _name.text = monster.Base.Species;
             _level.text = "Lvl: " + monster.Level;
             _health.SetHealth(monster.MaxHealth, monster.CurrentHealth);
+            SetStatusCondition(Utils.Conditions.PermanentConditionColours[monster.PermanentCondition]);
+        }
+
+        public void SetStatusCondition(Color statusColour)
+        {
+            _statusCondition.color = statusColour;
         }
     }
 }

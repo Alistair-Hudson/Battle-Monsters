@@ -44,11 +44,11 @@ public class MoveEffects
     [SerializeField]
     private List<StatEffect> _userStatEffects;
     public List<StatEffect> UserStatEffects { get => _userStatEffects; }
-    public PermanentCondition TargetPermCondition;
-    public PermanentCondition UserPermCondition;
-    public TemporaryCondition TargetTempCondition;
-    public TemporaryCondition UserTempCondition;
-    public WeatherCondition WeatherCondition;
+    public Conditions.PermanentCondition TargetPermCondition;
+    public Conditions.PermanentCondition UserPermCondition;
+    public Conditions.TemporaryCondition TargetTempCondition;
+    public Conditions.TemporaryCondition UserTempCondition;
+    public Conditions.WeatherCondition WeatherCondition;
 }
 
 [System.Serializable]

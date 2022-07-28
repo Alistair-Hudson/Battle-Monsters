@@ -18,3 +18,12 @@ MonoBehaviour:
   _power: 0
   _accuracy: 0
   _uses: 0
+  _moveEffects:
+    _targetStatEffects: []
+    _userStatEffects: []
+    TargetPermCondition: 1
+    UserPermCondition: 0
+    TargetTempCondition: 0
+    UserTempCondition: 0
+    WeatherCondition: 0
+  _moveTarget: 0

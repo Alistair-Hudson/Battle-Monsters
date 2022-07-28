@@ -22,7 +22,8 @@ namespace BattleMonsters.Monster
         public Dictionary<Stat, int> BaseStats { get; private set; }
         public Dictionary<Stat, int> CurrentStats { get; private set; }
         public Dictionary<Stat, int> StatModifiers { get; private set; }
-        public PermanentCondition PermanentCondition;
+        public Conditions.PermanentCondition PermanentCondition;
+        public Conditions.TemporaryCondition TemporaryCondition;
         public int SleepCount { get; set; }
 
         public void Init()
@@ -58,9 +59,9 @@ namespace BattleMonsters.Monster
             StatModifiers.Add(Stat.Speed, 0);
         }
 
-        public int Attack { get => PermanentCondition == PermanentCondition.Burnt ? Mathf.FloorToInt(CurrentStats[Stat.Attack] / 2) : CurrentStats[Stat.Attack]; }
+        public int Attack { get => PermanentCondition == Conditions.PermanentCondition.Burnt ? Mathf.FloorToInt(CurrentStats[Stat.Attack] / 2) : CurrentStats[Stat.Attack]; }
         public int Defense { get => CurrentStats[Stat.Defense]; }
-        public int Speed { get => PermanentCondition == PermanentCondition.Paralyzed ? Mathf.FloorToInt(CurrentStats[Stat.Speed] / 2) : CurrentStats[Stat.Speed]; }
+        public int Speed { get => PermanentCondition == Conditions.PermanentCondition.Paralyzed ? Mathf.FloorToInt(CurrentStats[Stat.Speed] / 2) : CurrentStats[Stat.Speed]; }
         public int MaxHealth { get; private set; }
 
         public MoveResults RecieveAttack(GenericMove attack, GenericMonster attacker)
@@ -71,9 +72,28 @@ namespace BattleMonsters.Monster
 
             if (!damageDetails.IsKO)
             {
-                ApplyEffects(attack.Base.Effects, damageDetails);
+                ApplyStatusEffects(attack.Base.Effects, attacker, damageDetails);
+                if (PermanentCondition == Conditions.PermanentCondition.None)
+                {
+                    PermanentCondition = damageDetails.TargetPermCondition = attack.Base.Effects.TargetPermCondition;
+                    if (PermanentCondition == Conditions.PermanentCondition.Asleep)
+                    {
+                        SleepCount = UnityEngine.Random.Range(2, 6);
+                    }
+                }
+                TemporaryCondition |= damageDetails.TargetTempCondition |=  attack.Base.Effects.TargetTempCondition;
             }
 
+            if (attacker.PermanentCondition == Conditions.PermanentCondition.None || damageDetails.UserPermCondition == Conditions.PermanentCondition.Asleep)
+            {
+                attacker.PermanentCondition = damageDetails.UserPermCondition = attack.Base.Effects.UserPermCondition;
+                if (attacker.PermanentCondition == Conditions.PermanentCondition.Asleep)
+                {
+                    attacker.SleepCount = UnityEngine.Random.Range(2, 6);
+                }
+            }
+            attacker.TemporaryCondition |= damageDetails.UserTempCondition |= attack.Base.Effects.UserTempCondition;
+                
             return damageDetails;
         }
 
@@ -108,7 +128,7 @@ namespace BattleMonsters.Monster
             }
         }
 
-        private void ApplyEffects(MoveEffects effects, MoveResults damageDetails)
+        private void ApplyStatusEffects(MoveEffects effects, GenericMonster attacker, MoveResults damageDetails)
         {
             foreach (var statMod in effects.TargetStatEffects)
             {
@@ -125,6 +145,31 @@ namespace BattleMonsters.Monster
                     damageDetails.TargetStatsAffected.Add(statMod.Stat, 1);
                 }
             }
+            foreach (var statMod in effects.UserStatEffects)
+            {
+                attacker.StatModifiers[statMod.Stat] = Mathf.Clamp(attacker.StatModifiers[statMod.Stat] + statMod.Modifier, -6, 6);
+                float modifier = 0.5f * attacker.StatModifiers[statMod.Stat] + 1f;
+                if (modifier < 0)
+                {
+                    attacker.CurrentStats[statMod.Stat] = Mathf.FloorToInt(attacker.BaseStats[statMod.Stat] / -modifier);
+                    damageDetails.UserStatsAffected.Add(statMod.Stat, -1);
+                }
+                else if (modifier > 0)
+                {
+                    attacker.CurrentStats[statMod.Stat] = Mathf.FloorToInt(attacker.BaseStats[statMod.Stat] * modifier);
+                    damageDetails.UserStatsAffected.Add(statMod.Stat, 1);
+                }
+            }
+        }
+
+        public bool ReceiveConditionalDamage(int damage)
+        {
+            CurrentHealth -= damage;
+            if (CurrentHealth <= 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         public class MoveResults
@@ -139,7 +184,13 @@ namespace BattleMonsters.Monster
             public Effectiveness Effective { get; set; }
             public bool Critical { get; set; }
             public Dictionary<Stat, int> TargetStatsAffected { get; set; }
-            public WeatherCondition WeatherCondition;
+            public Dictionary<Stat, int> UserStatsAffected { get; set; }
+            public Conditions.PermanentCondition TargetPermCondition { get; set; }
+            public Conditions.PermanentCondition UserPermCondition { get; set; }
+            public Conditions.TemporaryCondition TargetTempCondition { get; set; }
+            public Conditions.TemporaryCondition UserTempCondition { get; set; }
+
+            public Conditions.WeatherCondition WeatherCondition;
         }
     }
 }
