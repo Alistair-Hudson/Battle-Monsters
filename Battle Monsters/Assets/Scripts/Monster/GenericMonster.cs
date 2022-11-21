@@ -25,6 +25,7 @@ namespace BattleMonsters.Monster
         public Conditions.PermanentCondition PermanentCondition;
         public Conditions.TemporaryCondition TemporaryCondition;
         public int SleepCount { get; set; }
+        public int ConfusionCount { get; set; }
 
         public void Init()
         {
@@ -82,6 +83,10 @@ namespace BattleMonsters.Monster
                     }
                 }
                 TemporaryCondition |= damageDetails.TargetTempCondition |=  attack.Base.Effects.TargetTempCondition;
+                if (attack.Base.Effects.TargetTempCondition.HasFlag(Conditions.TemporaryCondition.Confusion))
+                {
+                    ConfusionCount = UnityEngine.Random.Range(2, 6);
+                }
             }
 
             if (attacker.PermanentCondition == Conditions.PermanentCondition.None || damageDetails.UserPermCondition == Conditions.PermanentCondition.Asleep)
@@ -93,7 +98,10 @@ namespace BattleMonsters.Monster
                 }
             }
             attacker.TemporaryCondition |= damageDetails.UserTempCondition |= attack.Base.Effects.UserTempCondition;
-                
+            if (attack.Base.Effects.UserTempCondition.HasFlag(Conditions.TemporaryCondition.Confusion))
+            {
+                attacker.ConfusionCount = UnityEngine.Random.Range(2, 6);
+            }    
             return damageDetails;
         }
 
@@ -170,6 +178,28 @@ namespace BattleMonsters.Monster
                 return true;
             }
             return false;
+        }
+
+        public void HealHealth(int heal)
+        {
+            CurrentHealth += heal;
+            if (CurrentHealth >= MaxHealth)
+            {
+                CurrentHealth = MaxHealth;
+            }
+        }
+
+        public void CureStatus (Utils.Conditions.PermanentCondition permanentCondition, Utils.Conditions.TemporaryCondition temporaryCondition)
+        {
+            if ((PermanentCondition & permanentCondition) != 0)
+            {
+                PermanentCondition = Conditions.PermanentCondition.None;
+            }
+
+            if ((TemporaryCondition & temporaryCondition) != 0)
+            {
+                TemporaryCondition = Conditions.TemporaryCondition.None;
+            }
         }
 
         public class MoveResults

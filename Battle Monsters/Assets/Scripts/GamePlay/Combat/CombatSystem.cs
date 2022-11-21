@@ -40,6 +40,8 @@ namespace BattleMonsters.GamePlay.Combat
         private float _thawChance = 0.2f;
         [SerializeField]
         private float _paralyzeOvercomeChance = 0.25f;
+        [SerializeField]
+        private float _confusionHurtChance = 0.33f; 
 
         private bool _isPlayerFainted = false;
 
@@ -254,6 +256,7 @@ namespace BattleMonsters.GamePlay.Combat
             switch (sourceUnit.Monster.PermanentCondition)
             {
                 case Utils.Conditions.PermanentCondition.Asleep:
+                    sourceUnit.Monster.SleepCount--;
                     isAbleToAttack = CheckSleepStatus(sourceUnit);
                     break;
                 case Utils.Conditions.PermanentCondition.Frozen:
@@ -266,7 +269,33 @@ namespace BattleMonsters.GamePlay.Combat
                     break;
             }
 
+            if (sourceUnit.Monster.TemporaryCondition.HasFlag(Conditions.TemporaryCondition.Confusion))
+            {
+                isAbleToAttack = CheckConfusion(sourceUnit);
+                sourceUnit.Monster.ConfusionCount--;
+            }
+
             return isAbleToAttack;
+        }
+
+        private bool CheckConfusion(BattleUnit sourceUnit)
+        {
+            if (sourceUnit.Monster.ConfusionCount-- <= 0)
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} snapped oput of confusion");
+                sourceUnit.Monster.TemporaryCondition = Utils.Conditions.TemporaryCondition.None;
+                return true;
+            }
+            else
+            {
+                if (UnityEngine.Random.Range(0, 1) <= _confusionHurtChance)
+                {
+                    _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} hurt itself in confusion");
+                    return false;
+                }
+                return true;
+            }
+    
         }
 
         private bool CheckFrozenStatus(BattleUnit sourceUnit)
@@ -301,6 +330,7 @@ namespace BattleMonsters.GamePlay.Combat
             if (sourceUnit.Monster.SleepCount-- <= 0)
             {
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} woke up");
+                sourceUnit.Monster.PermanentCondition = Utils.Conditions.PermanentCondition.None;
                 (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[Conditions.PermanentCondition.None]);
                 return true;
             }
