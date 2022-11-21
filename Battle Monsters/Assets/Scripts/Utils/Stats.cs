@@ -4,6 +4,8 @@ namespace BattleMonsters.Utils
     {
         Attack = 0,
         Defense,
-        Speed
+        Speed,
+        Accuracy,
+        Evasion
     }
 }

@@ -16,7 +16,10 @@ namespace BattleMonsters.Monster
         private int _level;
         public MonsterBase Base { get => _base;}
         public int Level { get => _level;}
-        
+
+        private int _baseAccuracy = 50;
+        private int _baseEvasion = 50;
+
         public int CurrentHealth { get; set; }
         public List<GenericMove> KnownMoves { get; set; }
         public Dictionary<Stat, int> BaseStats { get; private set; }
@@ -46,18 +49,24 @@ namespace BattleMonsters.Monster
             BaseStats.Add(Stat.Attack, Mathf.FloorToInt(Base.Attack * Level));
             BaseStats.Add(Stat.Defense, Mathf.FloorToInt(Base.Defense * Level));
             BaseStats.Add(Stat.Speed, Mathf.FloorToInt(Base.Speed * Level));
+            BaseStats.Add(Stat.Accuracy, _baseAccuracy);
+            BaseStats.Add(Stat.Evasion, _baseEvasion);
             MaxHealth = Mathf.FloorToInt(Base.MaxHealth * Level);
 
             CurrentStats = new Dictionary<Stat, int>();
             CurrentStats.Add(Stat.Attack, BaseStats[Stat.Attack]);
             CurrentStats.Add(Stat.Defense, BaseStats[Stat.Defense]);
             CurrentStats.Add(Stat.Speed, BaseStats[Stat.Speed]);
+            CurrentStats.Add(Stat.Accuracy, BaseStats[Stat.Accuracy]);
+            CurrentStats.Add(Stat.Evasion, BaseStats[Stat.Evasion]);
             CurrentHealth = MaxHealth;
 
             StatModifiers = new Dictionary<Stat, int>();
             StatModifiers.Add(Stat.Attack, 0);
             StatModifiers.Add(Stat.Defense, 0);
             StatModifiers.Add(Stat.Speed, 0);
+            StatModifiers.Add(Stat.Accuracy, 0);
+            StatModifiers.Add(Stat.Evasion, 0);
         }
 
         public int Attack { get => PermanentCondition == Conditions.PermanentCondition.Burnt ? Mathf.FloorToInt(CurrentStats[Stat.Attack] / 2) : CurrentStats[Stat.Attack]; }

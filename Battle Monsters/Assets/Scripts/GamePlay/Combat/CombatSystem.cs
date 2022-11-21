@@ -356,6 +356,12 @@ namespace BattleMonsters.GamePlay.Combat
             //exit battle
         }
 
+        private bool CheckHit(GenericMove move, GenericMonster source, GenericMonster target)
+        {
+            float accuracy = move.Base.Accuracy * source.CurrentStats[Utils.Stat.Accuracy] / target.CurrentStats[Utils.Stat.Evasion];
+            return UnityEngine.Random.Range(0, 101) <= accuracy;
+        }
+
         public void CallSwitchMonster(int index)
         {
             StartCoroutine(SwitchMonster(index));
