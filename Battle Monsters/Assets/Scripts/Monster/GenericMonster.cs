@@ -20,13 +20,12 @@ namespace BattleMonsters.Monster
         private int _baseAccuracy = 50;
         private int _baseEvasion = 50;
 
-        public int CurrentHealth { get; set; }
-        public List<GenericMove> KnownMoves { get; set; }
+        public int CurrentHealth { get; private set; }
+        public List<GenericMove> KnownMoves { get; private set; }
         public Dictionary<Stat, int> BaseStats { get; private set; }
         public Dictionary<Stat, int> CurrentStats { get; private set; }
-        public Dictionary<Stat, int> StatModifiers { get; private set; }
-        public Conditions.PermanentCondition PermanentCondition;
-        public Conditions.TemporaryCondition TemporaryCondition;
+        public Conditions.PermanentCondition PermanentCondition { get; private set; }
+        public Conditions.TemporaryCondition TemporaryCondition { get; private set; }
         public int SleepCount { get; set; }
         public int ConfusionCount { get; set; }
 
@@ -60,19 +59,14 @@ namespace BattleMonsters.Monster
             CurrentStats.Add(Stat.Accuracy, BaseStats[Stat.Accuracy]);
             CurrentStats.Add(Stat.Evasion, BaseStats[Stat.Evasion]);
             CurrentHealth = MaxHealth;
-
-            StatModifiers = new Dictionary<Stat, int>();
-            StatModifiers.Add(Stat.Attack, 0);
-            StatModifiers.Add(Stat.Defense, 0);
-            StatModifiers.Add(Stat.Speed, 0);
-            StatModifiers.Add(Stat.Accuracy, 0);
-            StatModifiers.Add(Stat.Evasion, 0);
         }
 
         public int Attack { get => PermanentCondition == Conditions.PermanentCondition.Burnt ? Mathf.FloorToInt(CurrentStats[Stat.Attack] / 2) : CurrentStats[Stat.Attack]; }
         public int Defense { get => CurrentStats[Stat.Defense]; }
         public int Speed { get => PermanentCondition == Conditions.PermanentCondition.Paralyzed ? Mathf.FloorToInt(CurrentStats[Stat.Speed] / 2) : CurrentStats[Stat.Speed]; }
         public int MaxHealth { get; private set; }
+        public int Accuracy { get => CurrentStats[Stat.Accuracy]; }
+        public int Evasion { get => CurrentStats[Stat.Evasion]; }
 
         public MoveResults RecieveAttack(GenericMove attack, GenericMonster attacker)
         {
@@ -149,31 +143,25 @@ namespace BattleMonsters.Monster
         {
             foreach (var statMod in effects.TargetStatEffects)
             {
-                StatModifiers[statMod.Stat] = Mathf.Clamp(StatModifiers[statMod.Stat] + statMod.Modifier, -6, 6);
-                float modifier = 0.5f * StatModifiers[statMod.Stat] + 1f;
-                if (modifier < 0)
+                CurrentStats[statMod.Stat] = Mathf.Clamp(CurrentStats[statMod.Stat] * statMod.Modifier, BaseStats[statMod.Stat] / 2, BaseStats[statMod.Stat] * 2);
+                if (statMod.Modifier < 1)
                 {
-                    CurrentStats[statMod.Stat] = Mathf.FloorToInt(BaseStats[statMod.Stat] / -modifier);
                     damageDetails.TargetStatsAffected.Add(statMod.Stat, -1);
                 }
-                else if (modifier > 0)
+                else if (statMod.Modifier > 1)
                 {
-                    CurrentStats[statMod.Stat] = Mathf.FloorToInt(BaseStats[statMod.Stat] * modifier);
                     damageDetails.TargetStatsAffected.Add(statMod.Stat, 1);
                 }
             }
             foreach (var statMod in effects.UserStatEffects)
             {
-                attacker.StatModifiers[statMod.Stat] = Mathf.Clamp(attacker.StatModifiers[statMod.Stat] + statMod.Modifier, -6, 6);
-                float modifier = 0.5f * attacker.StatModifiers[statMod.Stat] + 1f;
-                if (modifier < 0)
+                attacker.CurrentStats[statMod.Stat] = Mathf.Clamp(attacker.CurrentStats[statMod.Stat] * statMod.Modifier, attacker.BaseStats[statMod.Stat] / 2, attacker.BaseStats[statMod.Stat] * 2);
+                if (statMod.Modifier < 1)
                 {
-                    attacker.CurrentStats[statMod.Stat] = Mathf.FloorToInt(attacker.BaseStats[statMod.Stat] / -modifier);
                     damageDetails.UserStatsAffected.Add(statMod.Stat, -1);
                 }
-                else if (modifier > 0)
+                else if (statMod.Modifier > 1)
                 {
-                    attacker.CurrentStats[statMod.Stat] = Mathf.FloorToInt(attacker.BaseStats[statMod.Stat] * modifier);
                     damageDetails.UserStatsAffected.Add(statMod.Stat, 1);
                 }
             }

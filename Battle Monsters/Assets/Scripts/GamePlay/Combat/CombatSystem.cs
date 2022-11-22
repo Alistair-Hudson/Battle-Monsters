@@ -283,7 +283,7 @@ namespace BattleMonsters.GamePlay.Combat
             if (sourceUnit.Monster.ConfusionCount-- <= 0)
             {
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} snapped oput of confusion");
-                sourceUnit.Monster.TemporaryCondition = Utils.Conditions.TemporaryCondition.None;
+                sourceUnit.Monster.CureStatus(Utils.Conditions.PermanentCondition.None, Utils.Conditions.TemporaryCondition.Confusion);
                 return true;
             }
             else
@@ -303,7 +303,7 @@ namespace BattleMonsters.GamePlay.Combat
             if (UnityEngine.Random.Range(0, 1) <= _thawChance)
             {
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} thawed out");
-                sourceUnit.Monster.PermanentCondition = Utils.Conditions.PermanentCondition.None;
+                sourceUnit.Monster.CureStatus(Utils.Conditions.PermanentCondition.Frozen, Utils.Conditions.TemporaryCondition.None);
                 (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[Conditions.PermanentCondition.None]);
                 return true;
             }
@@ -330,7 +330,7 @@ namespace BattleMonsters.GamePlay.Combat
             if (sourceUnit.Monster.SleepCount-- <= 0)
             {
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} woke up");
-                sourceUnit.Monster.PermanentCondition = Utils.Conditions.PermanentCondition.None;
+                sourceUnit.Monster.CureStatus(Utils.Conditions.PermanentCondition.Asleep, Utils.Conditions.TemporaryCondition.None);
                 (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[Conditions.PermanentCondition.None]);
                 return true;
             }
@@ -358,7 +358,7 @@ namespace BattleMonsters.GamePlay.Combat
 
         private bool CheckHit(GenericMove move, GenericMonster source, GenericMonster target)
         {
-            float accuracy = move.Base.Accuracy * source.CurrentStats[Utils.Stat.Accuracy] / target.CurrentStats[Utils.Stat.Evasion];
+            float accuracy = move.Base.Accuracy * source.Accuracy / target.Evasion;
             return UnityEngine.Random.Range(0, 101) <= accuracy;
         }
 
