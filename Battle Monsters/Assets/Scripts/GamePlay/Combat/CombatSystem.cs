@@ -37,6 +37,8 @@ namespace BattleMonsters.GamePlay.Combat
         private GenericMonster _wildMon;
 
         [SerializeField]
+        private float _textDelayTime = 1f;
+        [SerializeField]
         private float _thawChance = 0.2f;
         [SerializeField]
         private float _paralyzeOvercomeChance = 0.25f;
@@ -80,7 +82,7 @@ namespace BattleMonsters.GamePlay.Combat
             _partyScreen.gameObject.SetActive(false);
 
             _dialogBox.SetDialog($"A wild {_opponentUnit.Monster.Base.Species} appeard!");
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(_textDelayTime);
             _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
             EnableActions(true);
         }
@@ -166,23 +168,30 @@ namespace BattleMonsters.GamePlay.Combat
 
             if (!IsAbleToAttack(sourceUnit))
             {
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(_textDelayTime);
                 yield break;
             }
 
             attack.Uses--;
             _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} used {attack.Base.MoveID}");
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(_textDelayTime);
 
-            MoveResults damageDetails = new MoveResults();
+            if (!CheckHit(attack, sourceUnit, targetUnit))
+            {
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} missed!");
+                yield return new WaitForSeconds(_textDelayTime);
+                yield break;
+            }
+
+            OnHitResult damageDetails = OnHitResult.None;
             switch (attack.Base.Target)
             {
                 case MoveTarget.Enemy:
-                    damageDetails = targetUnit.Monster.RecieveAttack(attack, sourceUnit.Monster);
+                    damageDetails = targetUnit.Monster.ReceiveDamage(attack, sourceUnit.Monster);
                     break;
                 case MoveTarget.Self:
-                    damageDetails = targetUnit.Monster.RecieveAttack(attack, sourceUnit.Monster);
+                    damageDetails = targetUnit.Monster.ReceiveDamage(attack, sourceUnit.Monster);
                     break;
                 default:
                     break;
@@ -191,62 +200,78 @@ namespace BattleMonsters.GamePlay.Combat
             _playerHUD.UpdateHealth();
             _opponentHUD.UpdateHealth();
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(_textDelayTime);
 
-            if (damageDetails.Critical)
+            if (damageDetails.HasFlag(OnHitResult.CriticalHit))
             {
                 _dialogBox.SetDialog($"Critical Hit!");
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(_textDelayTime);
             }
 
-            if (damageDetails.Effective != MoveResults.Effectiveness.Normal)
+            if (damageDetails.HasFlag(OnHitResult.SuperEffective))
             {
-                _dialogBox.SetDialog($"It was {damageDetails.Effective} effective");
-                yield return new WaitForSeconds(1f);
+                _dialogBox.SetDialog($"It was super effective");
+                yield return new WaitForSeconds(_textDelayTime);
+            }
+            if (damageDetails.HasFlag(OnHitResult.NotVeryEffective))
+            {
+                _dialogBox.SetDialog($"It was not very effective");
+                yield return new WaitForSeconds(_textDelayTime);
+            }
+            if (damageDetails.HasFlag(OnHitResult.NoEffect))
+            {
+                _dialogBox.SetDialog($"It has no effect");
+                yield return new WaitForSeconds(_textDelayTime);
             }
 
-            if (damageDetails.IsKO)
+            if (damageDetails.HasFlag(OnHitResult.KO))
             {
                 _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} was knocked out");
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(_textDelayTime);
 
                 ExecuteTargetFainted(targetUnit);
                 yield break;
             }
 
-            yield return RunStatusAffects(targetUnit, damageDetails);
-            yield return RunStatusAffects(sourceUnit, damageDetails);
+            yield return RunStatusAffects(targetUnit, attack.Base.Effects.TargetStatEffects);
+            yield return RunStatusAffects(sourceUnit, attack.Base.Effects.UserStatEffects);
 
-            if (damageDetails.TargetPermCondition != Conditions.PermanentCondition.None)
+            if (attack.Base.Effects.TargetPermCondition != Conditions.PermanentCondition.None)
             {
-                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {damageDetails.TargetPermCondition}");
-                (targetUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[damageDetails.TargetPermCondition]);
-                yield return new WaitForSeconds(1f);
+                targetUnit.Monster.ApplyStatusCondition(attack.Base.Effects.TargetPermCondition);
+                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {attack.Base.Effects.TargetPermCondition}");
+                (targetUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[attack.Base.Effects.TargetPermCondition]);
+                yield return new WaitForSeconds(_textDelayTime);
             }
 
-            if (damageDetails.UserPermCondition != Conditions.PermanentCondition.None)
+            if (attack.Base.Effects.UserPermCondition != Conditions.PermanentCondition.None)
             {
-                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {damageDetails.UserPermCondition}");
-                (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[damageDetails.TargetPermCondition]);
-                yield return new WaitForSeconds(1f);
+                sourceUnit.Monster.ApplyStatusCondition(attack.Base.Effects.UserPermCondition);
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {attack.Base.Effects.UserPermCondition}");
+                (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[attack.Base.Effects.UserPermCondition]);
+                yield return new WaitForSeconds(_textDelayTime);
             }
 
-            if (damageDetails.TargetTempCondition != Conditions.TemporaryCondition.None)
+            if (attack.Base.Effects.TargetTempCondition != Conditions.TemporaryCondition.None)
             {
-                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {damageDetails.TargetTempCondition}");
-                yield return new WaitForSeconds(1f);
+                targetUnit.Monster.ApplyVolatileStatusCondition(attack.Base.Effects.TargetTempCondition);
+                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {attack.Base.Effects.TargetTempCondition}");
+                yield return new WaitForSeconds(_textDelayTime);
             }
 
-            if (damageDetails.UserTempCondition != Conditions.TemporaryCondition.None)
+            if (attack.Base.Effects.UserTempCondition != Conditions.TemporaryCondition.None)
             {
-                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {damageDetails.UserTempCondition}");
-                yield return new WaitForSeconds(1f);
+                sourceUnit.Monster.ApplyVolatileStatusCondition(attack.Base.Effects.UserTempCondition);
+                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {attack.Base.Effects.UserTempCondition}");
+                yield return new WaitForSeconds(_textDelayTime);
             }
 
-            if (damageDetails.WeatherCondition != Utils.Conditions.WeatherCondition.None && damageDetails.WeatherCondition != _weatherCondition)
+            if (attack.Base.Effects.WeatherCondition != Utils.Conditions.WeatherCondition.None && attack.Base.Effects.WeatherCondition != _weatherCondition)
             {
-                _weatherCondition = damageDetails.WeatherCondition;
+                _weatherCondition = attack.Base.Effects.WeatherCondition;
                 _weatherCountdown = 5;
+                _dialogBox.SetDialog($"It started {attack.Base.Effects.WeatherCondition}");
+                yield return new WaitForSeconds(_textDelayTime);
             }
         }
 
@@ -356,9 +381,9 @@ namespace BattleMonsters.GamePlay.Combat
             //exit battle
         }
 
-        private bool CheckHit(GenericMove move, GenericMonster source, GenericMonster target)
+        private bool CheckHit(GenericMove move, BattleUnit source, BattleUnit target)
         {
-            float accuracy = move.Base.Accuracy * source.Accuracy / target.Evasion;
+            float accuracy = move.Base.Accuracy * (source.Monster.Accuracy / target.Monster.Evasion);
             return UnityEngine.Random.Range(0, 101) <= accuracy;
         }
 
@@ -422,12 +447,12 @@ namespace BattleMonsters.GamePlay.Combat
                 case Conditions.PermanentCondition.Poisoned:
                     isKO = unit.Monster.ReceiveConditionalDamage(Mathf.FloorToInt(unit.Monster.MaxHealth / 8f));
                     _dialogBox.SetDialog($"{unit.Monster.Base.Species} was hurt by the poison");
-                    yield return new WaitForSeconds(1f);
+                    yield return new WaitForSeconds(_textDelayTime);
                     break;
                 case Conditions.PermanentCondition.Burnt:
                     isKO = unit.Monster.ReceiveConditionalDamage(Mathf.FloorToInt(unit.Monster.MaxHealth / 16f));
                     _dialogBox.SetDialog($"{unit.Monster.Base.Species} was hurt by the burn");
-                    yield return new WaitForSeconds(1f);
+                    yield return new WaitForSeconds(_textDelayTime);
                     break;
                 default:
                     break;
@@ -458,22 +483,18 @@ namespace BattleMonsters.GamePlay.Combat
             yield return null;
         }
 
-        private IEnumerator RunStatusAffects(BattleUnit unit, MoveResults moveResults)
+        private IEnumerator RunStatusAffects(BattleUnit unit, List<StatEffect> stats)
         {
-            foreach (var stat in moveResults.TargetStatsAffected)
+            foreach (var stat in stats)
             {
-                switch (stat.Value)
+                if (stat.Modifier < 0)
                 {
-                    case -1:
-                        _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Key} was lowered");
-                        yield return new WaitForSeconds(1f);
-                        break;
-                    case 1:
-                        _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Key} was raised");
-                        yield return new WaitForSeconds(1f);
-                        break;
-                    default:
-                        break;
+                    _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Stat} was lowered");
+                    yield return new WaitForSeconds(_textDelayTime);
+                }else if (stat.Modifier > 0)
+                {
+                    _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Stat} was raised");
+                    yield return new WaitForSeconds(_textDelayTime);
                 }
             }
         }

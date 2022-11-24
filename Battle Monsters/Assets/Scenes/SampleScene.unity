@@ -2327,12 +2327,8 @@ MonoBehaviour:
   _party:
   - _base: {fileID: 11400000, guid: 754e3ff9c039d0a4bbe516abc2140b4f, type: 2}
     _level: 10
-    PermanentCondition: 0
-    TemporaryCondition: 0
   - _base: {fileID: 11400000, guid: ce689a7abbc623f4ab32beb83af9b1ac, type: 2}
     _level: 3
-    PermanentCondition: 0
-    TemporaryCondition: 0
 --- !u!4 &1026864753
 Transform:
   m_ObjectHideFlags: 0
@@ -2543,10 +2539,10 @@ MonoBehaviour:
   _wildMon:
     _base: {fileID: 11400000, guid: 754e3ff9c039d0a4bbe516abc2140b4f, type: 2}
     _level: 5
-    PermanentCondition: 0
-    TemporaryCondition: 0
+  _textDelayTime: 2
   _thawChance: 0.2
   _paralyzeOvercomeChance: 0.25
+  _confusionHurtChance: 0.33
 --- !u!1 &1154789852
 GameObject:
   m_ObjectHideFlags: 0

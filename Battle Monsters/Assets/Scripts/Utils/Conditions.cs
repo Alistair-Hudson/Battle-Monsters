@@ -31,6 +31,7 @@ namespace BattleMonsters.Utils
         {
             None = 0,
             Confusion = 1<<1,
+            Curse = 1<<2
         }
 
         public enum WeatherCondition

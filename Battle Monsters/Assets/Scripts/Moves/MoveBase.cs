@@ -55,7 +55,8 @@ public class MoveEffects
 public class StatEffect
 {
     public Stat Stat;
-    public int Modifier;
+    [Range(-1, 1)]
+    public float Modifier;
 }
 
 public enum MoveTarget

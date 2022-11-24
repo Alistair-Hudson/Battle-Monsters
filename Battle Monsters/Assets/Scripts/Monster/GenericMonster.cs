@@ -17,8 +17,8 @@ namespace BattleMonsters.Monster
         public MonsterBase Base { get => _base;}
         public int Level { get => _level;}
 
-        private int _baseAccuracy = 50;
-        private int _baseEvasion = 50;
+        private int _baseAccuracy = 100;
+        private int _baseEvasion = 100;
 
         public int CurrentHealth { get; private set; }
         public List<GenericMove> KnownMoves { get; private set; }
@@ -68,48 +68,9 @@ namespace BattleMonsters.Monster
         public int Accuracy { get => CurrentStats[Stat.Accuracy]; }
         public int Evasion { get => CurrentStats[Stat.Evasion]; }
 
-        public MoveResults RecieveAttack(GenericMove attack, GenericMonster attacker)
+        public OnHitResult ReceiveDamage(GenericMove attack, GenericMonster attacker)
         {
-            MoveResults damageDetails = new MoveResults();
-            damageDetails.TargetStatsAffected = new Dictionary<Stat, int>();
-            SetDamageDetails(attack, attacker, damageDetails);
-
-            if (!damageDetails.IsKO)
-            {
-                ApplyStatusEffects(attack.Base.Effects, attacker, damageDetails);
-                if (PermanentCondition == Conditions.PermanentCondition.None)
-                {
-                    PermanentCondition = damageDetails.TargetPermCondition = attack.Base.Effects.TargetPermCondition;
-                    if (PermanentCondition == Conditions.PermanentCondition.Asleep)
-                    {
-                        SleepCount = UnityEngine.Random.Range(2, 6);
-                    }
-                }
-                TemporaryCondition |= damageDetails.TargetTempCondition |=  attack.Base.Effects.TargetTempCondition;
-                if (attack.Base.Effects.TargetTempCondition.HasFlag(Conditions.TemporaryCondition.Confusion))
-                {
-                    ConfusionCount = UnityEngine.Random.Range(2, 6);
-                }
-            }
-
-            if (attacker.PermanentCondition == Conditions.PermanentCondition.None || damageDetails.UserPermCondition == Conditions.PermanentCondition.Asleep)
-            {
-                attacker.PermanentCondition = damageDetails.UserPermCondition = attack.Base.Effects.UserPermCondition;
-                if (attacker.PermanentCondition == Conditions.PermanentCondition.Asleep)
-                {
-                    attacker.SleepCount = UnityEngine.Random.Range(2, 6);
-                }
-            }
-            attacker.TemporaryCondition |= damageDetails.UserTempCondition |= attack.Base.Effects.UserTempCondition;
-            if (attack.Base.Effects.UserTempCondition.HasFlag(Conditions.TemporaryCondition.Confusion))
-            {
-                attacker.ConfusionCount = UnityEngine.Random.Range(2, 6);
-            }    
-            return damageDetails;
-        }
-
-        private void SetDamageDetails(GenericMove attack, GenericMonster attacker, MoveResults damageDetails)
-        {
+            OnHitResult result = OnHitResult.None;
             float typeModifier = TypeChart.GetEffectiveness(attack.Base.Type, Base.Type1) * TypeChart.GetEffectiveness(attack.Base.Type, Base.Type2);
             float randomModifier = UnityEngine.Random.Range(0.85f, 1f);
             float a = (2f * attacker.Level + 10f) / 250f;
@@ -119,50 +80,81 @@ namespace BattleMonsters.Monster
             if (UnityEngine.Random.value * 100f <= 6.25f)
             {
                 damage *= 2;
-                damageDetails.Critical = true;
+                result |= OnHitResult.CriticalHit;
             }
 
             CurrentHealth -= damage;
             if (CurrentHealth <= 0f)
             {
                 CurrentHealth = 0;
-                damageDetails.IsKO = true;
+                result |= OnHitResult.KO;
             }
 
-            if (typeModifier > 1)
+            if (typeModifier == 0)
             {
-                damageDetails.Effective = MoveResults.Effectiveness.Super;
+                result |= OnHitResult.NoEffect;
+            }
+            else if (typeModifier > 1)
+            {
+                result |= OnHitResult.SuperEffective;
             }
             else if (typeModifier < 1)
             {
-                damageDetails.Effective = MoveResults.Effectiveness.Not;
+                result |= OnHitResult.NotVeryEffective;
             }
+
+            return result;
         }
 
-        private void ApplyStatusEffects(MoveEffects effects, GenericMonster attacker, MoveResults damageDetails)
+        public void ApplyStatusEffect(GenericMove attack, GenericMonster attacker)
         {
+            MoveEffects effects = attack.Base.Effects;
             foreach (var statMod in effects.TargetStatEffects)
             {
-                CurrentStats[statMod.Stat] = Mathf.Clamp(CurrentStats[statMod.Stat] * statMod.Modifier, BaseStats[statMod.Stat] / 2, BaseStats[statMod.Stat] * 2);
-                if (statMod.Modifier < 1)
+                CurrentStats[statMod.Stat] = Mathf.FloorToInt(Mathf.Clamp(CurrentStats[statMod.Stat] + BaseStats[statMod.Stat] * statMod.Modifier, BaseStats[statMod.Stat] / 2, BaseStats[statMod.Stat] * 2));
+                if (statMod.Modifier < 0)
                 {
-                    damageDetails.TargetStatsAffected.Add(statMod.Stat, -1);
+                    
                 }
-                else if (statMod.Modifier > 1)
+                else if (statMod.Modifier > 0)
                 {
-                    damageDetails.TargetStatsAffected.Add(statMod.Stat, 1);
+                    
                 }
             }
             foreach (var statMod in effects.UserStatEffects)
             {
-                attacker.CurrentStats[statMod.Stat] = Mathf.Clamp(attacker.CurrentStats[statMod.Stat] * statMod.Modifier, attacker.BaseStats[statMod.Stat] / 2, attacker.BaseStats[statMod.Stat] * 2);
-                if (statMod.Modifier < 1)
+                attacker.CurrentStats[statMod.Stat] = Mathf.FloorToInt(Mathf.Clamp(attacker.CurrentStats[statMod.Stat] + attacker.BaseStats[statMod.Stat] * statMod.Modifier, attacker.BaseStats[statMod.Stat] / 2, attacker.BaseStats[statMod.Stat] * 2));
+                if (statMod.Modifier < 0)
                 {
-                    damageDetails.UserStatsAffected.Add(statMod.Stat, -1);
+                    
                 }
-                else if (statMod.Modifier > 1)
+                else if (statMod.Modifier > 0)
                 {
-                    damageDetails.UserStatsAffected.Add(statMod.Stat, 1);
+                    
+                }
+            }
+        }
+
+        public void ApplyStatusCondition(Conditions.PermanentCondition condition)
+        {
+            if (PermanentCondition == Conditions.PermanentCondition.None)
+            {
+                PermanentCondition = condition;
+                if (condition == Conditions.PermanentCondition.Asleep)
+                {
+                    SleepCount = UnityEngine.Random.Range(2, 6);
+                }
+            }
+        }
+
+        public void ApplyVolatileStatusCondition(Conditions.TemporaryCondition condition)
+        {
+            if (!TemporaryCondition.HasFlag(condition))
+            {
+                TemporaryCondition |= condition;
+                if (condition.HasFlag(Conditions.TemporaryCondition.Confusion))
+                {
+                    ConfusionCount = UnityEngine.Random.Range(2, 6);
                 }
             }
         }
