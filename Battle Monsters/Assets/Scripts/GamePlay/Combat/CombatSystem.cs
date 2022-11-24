@@ -238,40 +238,55 @@ namespace BattleMonsters.GamePlay.Combat
 
             if (attack.Base.Effects.TargetPermCondition != Conditions.PermanentCondition.None)
             {
-                targetUnit.Monster.ApplyStatusCondition(attack.Base.Effects.TargetPermCondition);
-                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {attack.Base.Effects.TargetPermCondition}");
-                (targetUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[attack.Base.Effects.TargetPermCondition]);
-                yield return new WaitForSeconds(_textDelayTime);
+                if (UnityEngine.Random.Range(0f, 1f) <= attack.Base.Effects.ChanceOfTargetPermCondition)
+                {
+                    targetUnit.Monster.ApplyStatusCondition(attack.Base.Effects.TargetPermCondition);
+                    _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {attack.Base.Effects.TargetPermCondition}");
+                    (targetUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[attack.Base.Effects.TargetPermCondition]);
+                    yield return new WaitForSeconds(_textDelayTime);
+                }
             }
 
             if (attack.Base.Effects.UserPermCondition != Conditions.PermanentCondition.None)
             {
-                sourceUnit.Monster.ApplyStatusCondition(attack.Base.Effects.UserPermCondition);
-                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {attack.Base.Effects.UserPermCondition}");
-                (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[attack.Base.Effects.UserPermCondition]);
-                yield return new WaitForSeconds(_textDelayTime);
+                if (UnityEngine.Random.Range(0f, 1f) <= attack.Base.Effects.ChanceOfUserPermCondition)
+                {
+                    sourceUnit.Monster.ApplyStatusCondition(attack.Base.Effects.UserPermCondition);
+                    _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {attack.Base.Effects.UserPermCondition}");
+                    (sourceUnit.IsPlayer ? _playerHUD : _opponentHUD).SetStatusCondition(Conditions.PermanentConditionColours[attack.Base.Effects.UserPermCondition]);
+                    yield return new WaitForSeconds(_textDelayTime);
+                }
             }
 
             if (attack.Base.Effects.TargetTempCondition != Conditions.TemporaryCondition.None)
             {
-                targetUnit.Monster.ApplyVolatileStatusCondition(attack.Base.Effects.TargetTempCondition);
-                _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {attack.Base.Effects.TargetTempCondition}");
-                yield return new WaitForSeconds(_textDelayTime);
+                if (UnityEngine.Random.Range(0f, 1f) <= attack.Base.Effects.ChanceOfTargetTempCondition)
+                {
+                    targetUnit.Monster.ApplyVolatileStatusCondition(attack.Base.Effects.TargetTempCondition);
+                    _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} is {attack.Base.Effects.TargetTempCondition}");
+                    yield return new WaitForSeconds(_textDelayTime);
+                }
             }
 
             if (attack.Base.Effects.UserTempCondition != Conditions.TemporaryCondition.None)
             {
-                sourceUnit.Monster.ApplyVolatileStatusCondition(attack.Base.Effects.UserTempCondition);
-                _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {attack.Base.Effects.UserTempCondition}");
-                yield return new WaitForSeconds(_textDelayTime);
+                if (UnityEngine.Random.Range(0f, 1f) <= attack.Base.Effects.ChanceOfUserTempCondition)
+                {
+                    sourceUnit.Monster.ApplyVolatileStatusCondition(attack.Base.Effects.UserTempCondition);
+                    _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} is {attack.Base.Effects.UserTempCondition}");
+                    yield return new WaitForSeconds(_textDelayTime);
+                }
             }
 
             if (attack.Base.Effects.WeatherCondition != Utils.Conditions.WeatherCondition.None && attack.Base.Effects.WeatherCondition != _weatherCondition)
             {
-                _weatherCondition = attack.Base.Effects.WeatherCondition;
-                _weatherCountdown = 5;
-                _dialogBox.SetDialog($"It started {attack.Base.Effects.WeatherCondition}");
-                yield return new WaitForSeconds(_textDelayTime);
+                if (UnityEngine.Random.Range(0f, 1f) <= attack.Base.Effects.ChanceOfWeatherCondition)
+                {
+                    _weatherCondition = attack.Base.Effects.WeatherCondition;
+                    _weatherCountdown = 5;
+                    _dialogBox.SetDialog($"It started {attack.Base.Effects.WeatherCondition}");
+                    yield return new WaitForSeconds(_textDelayTime);
+                }
             }
         }
 
@@ -383,6 +398,10 @@ namespace BattleMonsters.GamePlay.Combat
 
         private bool CheckHit(GenericMove move, BattleUnit source, BattleUnit target)
         {
+            if (move.Base.Accuracy < 0)
+            {
+                return true;
+            }
             float accuracy = move.Base.Accuracy * (source.Monster.Accuracy / target.Monster.Evasion);
             return UnityEngine.Random.Range(0, 101) <= accuracy;
         }

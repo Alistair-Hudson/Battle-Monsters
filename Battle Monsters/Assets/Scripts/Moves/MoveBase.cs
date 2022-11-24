@@ -16,6 +16,8 @@ namespace BattleMonsters.Moves
         [SerializeField]
         private int _power;
         [SerializeField]
+        [Tooltip("For moves that are a sure hit set value to -1")]
+        [Range(0, 100)]
         private int _accuracy;
         [SerializeField]
         private int _uses;
@@ -45,10 +47,20 @@ public class MoveEffects
     private List<StatEffect> _userStatEffects;
     public List<StatEffect> UserStatEffects { get => _userStatEffects; }
     public Conditions.PermanentCondition TargetPermCondition;
+    [Range(0, 1)]
+    public float ChanceOfTargetPermCondition;
     public Conditions.PermanentCondition UserPermCondition;
+    [Range(0, 1)]
+    public float ChanceOfUserPermCondition;
     public Conditions.TemporaryCondition TargetTempCondition;
+    [Range(0, 1)]
+    public float ChanceOfTargetTempCondition;
     public Conditions.TemporaryCondition UserTempCondition;
+    [Range(0, 1)]
+    public float ChanceOfUserTempCondition;
     public Conditions.WeatherCondition WeatherCondition;
+    [Range(0, 1)]
+    public float ChanceOfWeatherCondition;
 }
 
 [System.Serializable]
@@ -57,6 +69,8 @@ public class StatEffect
     public Stat Stat;
     [Range(-1, 1)]
     public float Modifier;
+    [Range(0, 1)]
+    public float ChanceOfEffect;
 }
 
 public enum MoveTarget
