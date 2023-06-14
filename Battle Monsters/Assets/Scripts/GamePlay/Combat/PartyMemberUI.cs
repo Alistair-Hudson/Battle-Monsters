@@ -11,8 +11,6 @@ namespace BattleMonsters.GamePlay.Combat
         [SerializeField]
         private TMP_Text _name;
         [SerializeField]
-        private TMP_Text _level;
-        [SerializeField]
         private HealthBar _health;
         [SerializeField]
         private Image _statusCondition;
@@ -23,7 +21,6 @@ namespace BattleMonsters.GamePlay.Combat
         {
             _monster = monster;
             _name.text = monster.Base.Species;
-            _level.text = "Lvl: " + monster.Level;
             _health.SetHealth(monster.MaxHealth, monster.CurrentHealth);
             SetStatusCondition(Utils.Conditions.PermanentConditionColours[monster.PermanentCondition]);
         }

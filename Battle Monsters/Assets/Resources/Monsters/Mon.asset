@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _species: Mon
   _model: {fileID: 0}
-  _type1: 1
+  _type1: 3
   _type2: 0
   _learnableMoves:
   - _moveBase: {fileID: 11400000, guid: 532a8c959ea426d41890750fa7a52834, type: 2}

@@ -1,3 +1,4 @@
+using BattleMonsters.Moves;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace BattleMonsters.Monster
         private Utils.Type _type2;
 
         [SerializeField]
-        private List<LearnableMove> _learnableMoves;
+        private List<MoveBase> _moveSet;
 
         [SerializeField]
         private int _baseSpeed = 1;
@@ -37,19 +38,7 @@ namespace BattleMonsters.Monster
         public int Attack { get => _baseAttack; }
         public int Defense { get => _baseDefense; }
         public int MaxHealth { get => _maxHealth; }
-        public List<LearnableMove> LearnableMoves { get => _learnableMoves; }
+        public List<MoveBase> MoveSet { get => _moveSet; }
 
-    }
-
-    [Serializable]
-    public class LearnableMove
-    {
-        [SerializeField]
-        private Moves.MoveBase _moveBase;
-        [SerializeField]
-        private int _level;
-
-        public Moves.MoveBase MoveBase { get => _moveBase; }
-        public int Level { get => _level; }
     }
 }

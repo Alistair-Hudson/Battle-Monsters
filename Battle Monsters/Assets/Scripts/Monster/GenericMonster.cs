@@ -12,16 +12,13 @@ namespace BattleMonsters.Monster
     {
         [SerializeField]
         private MonsterBase _base;
-        [SerializeField]
-        private int _level;
         public MonsterBase Base { get => _base;}
-        public int Level { get => _level;}
 
         private int _baseAccuracy = 100;
         private int _baseEvasion = 100;
 
         public int CurrentHealth { get; private set; }
-        public List<GenericMove> KnownMoves { get; private set; }
+        public List<GenericMove> Moves { get; private set; }
         public Dictionary<Stat, int> BaseStats { get; private set; }
         public Dictionary<Stat, int> CurrentStats { get; private set; }
         public Conditions.PermanentCondition PermanentCondition { get; private set; }
@@ -31,26 +28,23 @@ namespace BattleMonsters.Monster
 
         public void Init()
         {
-            KnownMoves = new List<GenericMove>();
-            foreach (var move in Base.LearnableMoves)
+            Moves = new List<GenericMove>();
+            foreach (var move in Base.MoveSet)
             {
-                if (move.Level <= Level)
-                {
-                    KnownMoves.Add(new GenericMove(move.MoveBase));
-                }
-                if (KnownMoves.Count >= 4)
+                Moves.Add(new GenericMove(move));
+                if (Moves.Count >= 4)
                 {
                     break;
                 }
             }
 
             BaseStats = new Dictionary<Stat, int>();
-            BaseStats.Add(Stat.Attack, Mathf.FloorToInt(Base.Attack * Level));
-            BaseStats.Add(Stat.Defense, Mathf.FloorToInt(Base.Defense * Level));
-            BaseStats.Add(Stat.Speed, Mathf.FloorToInt(Base.Speed * Level));
+            BaseStats.Add(Stat.Attack, Mathf.FloorToInt(Base.Attack));
+            BaseStats.Add(Stat.Defense, Mathf.FloorToInt(Base.Defense));
+            BaseStats.Add(Stat.Speed, Mathf.FloorToInt(Base.Speed));
             BaseStats.Add(Stat.Accuracy, _baseAccuracy);
             BaseStats.Add(Stat.Evasion, _baseEvasion);
-            MaxHealth = Mathf.FloorToInt(Base.MaxHealth * Level);
+            MaxHealth = Mathf.FloorToInt(Base.MaxHealth);
 
             CurrentStats = new Dictionary<Stat, int>();
             CurrentStats.Add(Stat.Attack, BaseStats[Stat.Attack]);
@@ -73,8 +67,7 @@ namespace BattleMonsters.Monster
             OnHitResult result = OnHitResult.None;
             float typeModifier = TypeChart.GetEffectiveness(attack.Base.Type, Base.Type1) * TypeChart.GetEffectiveness(attack.Base.Type, Base.Type2);
             float randomModifier = UnityEngine.Random.Range(0.85f, 1f);
-            float a = (2f * attacker.Level + 10f) / 250f;
-            float d = a * attack.Base.Power * ((float)attacker.Attack / Defense) + 2f;
+            float d = attack.Base.Power * ((float)attacker.Attack / Defense) + 2f;
             int damage = Mathf.FloorToInt(d * randomModifier * typeModifier);
 
             if (UnityEngine.Random.value * 100f <= 6.25f)

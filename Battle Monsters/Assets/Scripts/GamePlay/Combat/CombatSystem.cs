@@ -21,8 +21,6 @@ namespace BattleMonsters.GamePlay.Combat
         private HUD _opponentHUD;
         [SerializeField]
         private CombatDialog _dialogBox;
-        [SerializeField]
-        private PartyScreen _partyScreen;
 
         [SerializeField]
         private GameObject _dialogText;
@@ -32,7 +30,7 @@ namespace BattleMonsters.GamePlay.Combat
         private AttackButtonsManager _attackButtons;
 
         [SerializeField]
-        private Party _playerParty;
+        private GenericMonster _playerMon;
         [SerializeField]
         private GenericMonster _wildMon;
 
@@ -60,9 +58,9 @@ namespace BattleMonsters.GamePlay.Combat
             StartCoroutine(SetUpBattle());
         }
 
-        private void StartBattle(Party playerParty, GenericMonster wildMon)
+        private void StartBattle(GenericMonster playerMon, GenericMonster wildMon)
         {
-            _playerParty = playerParty;
+            _playerMon = playerMon;
             _wildMon = wildMon;
             StartCoroutine(SetUpBattle());
         }
@@ -71,26 +69,15 @@ namespace BattleMonsters.GamePlay.Combat
         {
             //Set up HUDS
             _wildMon.Init();
-            _playerUnit.Setup(_playerParty.GetHealthyMon());
+            _playerUnit.Setup(_playerMon);
             _playerHUD.SetHUDData(_playerUnit.Monster);
             _opponentUnit.Setup(_wildMon);
             _opponentHUD.SetHUDData(_opponentUnit.Monster);
-
-            //Set Players party
-            _partyScreen.gameObject.SetActive(true);
-            _partyScreen.Init();
-            _partyScreen.gameObject.SetActive(false);
 
             _dialogBox.SetDialog($"A wild {_opponentUnit.Monster.Base.Species} appeard!");
             yield return new WaitForSeconds(_textDelayTime);
             _dialogBox.SetDialog($"What Should {_playerUnit.Monster.Base.Species} do?");
             EnableActions(true);
-        }
-
-        public void OpenPartyScreen()
-        {
-            _partyScreen.SetPartyData(_playerParty.PartyList, _playerUnit.Monster);
-            _partyScreen.gameObject.SetActive(true);
         }
 
         public void CancelAttacks()
@@ -114,7 +101,7 @@ namespace BattleMonsters.GamePlay.Combat
         public void EnableAttacks(bool enable)
         {
             _attackButtons.gameObject.SetActive(enable);
-            _attackButtons.SetButtons(_playerUnit.Monster.KnownMoves);
+            _attackButtons.SetButtons(_playerUnit.Monster.Moves);
         }
 
         public void PerformAttack(int attackButtonIndex)
@@ -151,13 +138,13 @@ namespace BattleMonsters.GamePlay.Combat
 
         private IEnumerator PerformPlayerAttack(int attackButtonIndex)
         {
-            GenericMove attack = _playerUnit.Monster.KnownMoves[attackButtonIndex];
+            GenericMove attack = _playerUnit.Monster.Moves[attackButtonIndex];
             yield return PerformAttack(_playerUnit, _opponentUnit, attack);
         }
 
         private IEnumerator PerformEnemyAttack()
         {
-            GenericMove attack = _opponentUnit.Monster.KnownMoves[UnityEngine.Random.Range(0, _opponentUnit.Monster.KnownMoves.Count)];
+            GenericMove attack = _opponentUnit.Monster.Moves[UnityEngine.Random.Range(0, _opponentUnit.Monster.Moves.Count)];
             yield return PerformAttack(_opponentUnit, _playerUnit, attack);
         }
 
@@ -385,12 +372,7 @@ namespace BattleMonsters.GamePlay.Combat
         {
             if (targetUnit.IsPlayer)
             {
-                var nextMon = _playerParty.GetHealthyMon();
-                if (nextMon != null)
-                {
-                    OpenPartyScreen();
-                    _isPlayerFainted = true;
-                }
+
             }
 
             //exit battle
@@ -404,35 +386,6 @@ namespace BattleMonsters.GamePlay.Combat
             }
             float accuracy = move.Base.Accuracy * (source.Monster.Accuracy / target.Monster.Evasion);
             return UnityEngine.Random.Range(0, 101) <= accuracy;
-        }
-
-        public void CallSwitchMonster(int index)
-        {
-            StartCoroutine(SwitchMonster(index));
-        }
-
-        IEnumerator SwitchMonster(int monsterPartyIndex)
-        {
-            _partyScreen.gameObject.SetActive(false);
-            bool activeSwitch = false;
-            if (_playerUnit.Monster.CurrentHealth > 0)
-            {
-                _dialogBox.SetDialog($"return {_playerUnit.Monster.Base.Species}");
-                yield return new WaitForSeconds(1f);
-                activeSwitch = true;
-            }
-            var newMon = _playerParty.GetMonByIndex(monsterPartyIndex);
-            _dialogBox.SetDialog($"Go {newMon.Base.Species}!");
-            yield return new WaitForSeconds(1f);
-            _playerUnit.Setup(newMon);
-            _playerHUD.SetHUDData(_playerUnit.Monster);
-
-            if (activeSwitch)
-            {
-                yield return PerformEnemyAttack();
-            }
-
-            yield return EndofRoundEffects();
         }
 
         private IEnumerator EndofRoundEffects()

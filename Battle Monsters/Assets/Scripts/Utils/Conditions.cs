@@ -6,15 +6,14 @@ namespace BattleMonsters.Utils
 {
     public class Conditions
     {
-        [Flags]
         public enum PermanentCondition
         {
             None = 0,
-            Asleep = 1<<1,
-            Poisoned = 1<<2,
-            Frozen = 1<<3,
-            Burnt = 1<<4,
-            Paralyzed = 1<<5
+            Asleep = 1,
+            Poisoned = 2,
+            Frozen = 3,
+            Burnt = 4,
+            Paralyzed = 5
         }
 
         public static readonly Dictionary<PermanentCondition, Color> PermanentConditionColours = new Dictionary<PermanentCondition, Color> {

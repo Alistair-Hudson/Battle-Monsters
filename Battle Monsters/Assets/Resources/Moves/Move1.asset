@@ -18,3 +18,14 @@ MonoBehaviour:
   _power: 50
   _accuracy: 100
   _uses: 10
+  _moveEffects:
+    _targetStatEffects:
+    - Stat: 0
+      Modifier: 0.61
+    _userStatEffects: []
+    TargetPermCondition: 2
+    UserPermCondition: 0
+    TargetTempCondition: 0
+    UserTempCondition: 2
+    WeatherCondition: 2
+  _moveTarget: 0
