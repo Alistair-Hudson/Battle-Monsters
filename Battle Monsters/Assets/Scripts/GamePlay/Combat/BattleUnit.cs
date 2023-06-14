@@ -17,6 +17,7 @@ namespace BattleMonsters.GamePlay.Combat
         {
             //Instanitate Mon
             Monster = monster;
+            Instantiate(monster.Base.Model, transform);
         }
     }
 }

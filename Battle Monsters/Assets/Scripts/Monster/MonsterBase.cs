@@ -32,6 +32,7 @@ namespace BattleMonsters.Monster
         private int _maxHealth = 10;
 
         public string Species { get => _species; }
+        public GameObject Model { get => _model; }
         public Utils.Type Type1 { get => _type1; }
         public Utils.Type Type2 { get => _type2; }
         public int Speed { get => _baseSpeed; }

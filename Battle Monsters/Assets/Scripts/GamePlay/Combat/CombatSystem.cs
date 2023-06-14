@@ -69,6 +69,7 @@ namespace BattleMonsters.GamePlay.Combat
         {
             //Set up HUDS
             _wildMon.Init();
+            _playerMon.Init();
             _playerUnit.Setup(_playerMon);
             _playerHUD.SetHUDData(_playerUnit.Monster);
             _opponentUnit.Setup(_wildMon);
@@ -370,11 +371,6 @@ namespace BattleMonsters.GamePlay.Combat
 
         private void ExecuteTargetFainted(BattleUnit targetUnit)
         {
-            if (targetUnit.IsPlayer)
-            {
-
-            }
-
             //exit battle
         }
 

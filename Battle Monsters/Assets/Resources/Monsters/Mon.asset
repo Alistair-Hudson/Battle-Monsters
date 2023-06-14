@@ -13,15 +13,13 @@ MonoBehaviour:
   m_Name: Mon
   m_EditorClassIdentifier: 
   _species: Mon
-  _model: {fileID: 0}
+  _model: {fileID: 6634850941027155736, guid: b6397640d2ec100439b3e3905757b7ab, type: 3}
   _type1: 3
   _type2: 0
-  _learnableMoves:
-  - _moveBase: {fileID: 11400000, guid: 532a8c959ea426d41890750fa7a52834, type: 2}
-    _level: 1
-  - _moveBase: {fileID: 11400000, guid: 1928c3722fe5fb049ba8575236704f7c, type: 2}
-    _level: 10
-  _baseSpeed: 1
+  _moveSet:
+  - {fileID: 11400000, guid: 532a8c959ea426d41890750fa7a52834, type: 2}
+  - {fileID: 11400000, guid: 1928c3722fe5fb049ba8575236704f7c, type: 2}
+  _baseSpeed: 5
   _baseAttack: 1
   _baseDefense: 1
-  _maxHealth: 10
+  _maxHealth: 50
