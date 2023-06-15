@@ -54,5 +54,21 @@ namespace BattleMonsters.Monster
         public int MaxHealth { get => _maxHealth; }
         public List<MoveBase> MoveSet { get => _moveSet; }
 
+        public void SetMonster(string[] data)
+        {
+            _species = data[0];
+            Enum.TryParse(data[1], out _type1);
+            Enum.TryParse(data[2], out _type2);
+            _baseSpeed = int.Parse(data[3]);
+            _baseAttack = int.Parse(data[4]);
+            _baseDefense = int.Parse(data[5]);
+            _maxHealth = int.Parse(data[6]);
+            _moveSet = new List<MoveBase>();
+            _moveSet.Add(Resources.Load($"Moves/{data[7]}") as MoveBase);
+            _moveSet.Add(Resources.Load($"Moves/{data[8]}") as MoveBase);
+            _moveSet.Add(Resources.Load($"Moves/{data[9]}") as MoveBase);
+            _moveSet.Add(Resources.Load($"Moves/{data[10]}") as MoveBase);
+        }
+
     }
 }

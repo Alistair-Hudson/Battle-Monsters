@@ -1,3 +1,11 @@
 MoveID,Description,Type,Power,Accuracy,Uses
 Fireball,Shoots a fireball at the enemy can leave a burn,Fire,40,100,10
 Poison Spit,Spits poison at the enemy can leave the enemy poisoned,Grass,40,90,10
+Forest Wind,By flapping it wings the user greats a small wind that lowers Evasion,Grass,10,100,10
+Spit,Shoots a jet of water the can reduce speed,Water,40,100,10
+Tackle,The user slams their body into the oponent,None,50,100,10
+Nova Burst,The user uses the flames in its body to raise its attack,Fire,0,-1,15
+Shrouded Mist,The user creates a mist the raises its evasion,Water,0,-1,15
+Heal,The user calls upon the earth to heal itself,Grass,0,-1,5
+Nova Blast,The user uses the power of the Sol to blast it's oponent,Fire,100,50,10
+Rain Dance,The user dances about to bring about a rain cloud,Water,0,-1,5

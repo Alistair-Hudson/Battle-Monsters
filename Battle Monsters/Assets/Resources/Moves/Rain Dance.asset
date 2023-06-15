@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28ba2a065dc02b246a97f6d9d959f562, type: 3}
-  m_Name: Spit
+  m_Name: Rain Dance
   m_EditorClassIdentifier: 
-  _moveID: Spit
-  _description: Shoots a jet of water the can reduce speed
+  _moveID: Rain Dance
+  _description: The user dances about to bring about a rain cloud
   _type: 2
-  _power: 40
-  _accuracy: 100
-  _uses: 10
+  _power: 0
+  _accuracy: -1
+  _uses: 5
   _moveEffects:
     _targetStatEffects: []
     _userStatEffects: []

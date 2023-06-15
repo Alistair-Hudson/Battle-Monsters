@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28ba2a065dc02b246a97f6d9d959f562, type: 3}
-  m_Name: Spit
+  m_Name: Forest Wind
   m_EditorClassIdentifier: 
-  _moveID: Spit
-  _description: Shoots a jet of water the can reduce speed
-  _type: 2
-  _power: 40
+  _moveID: Forest Wind
+  _description: By flapping it wings the user greats a small wind that lowers Evasion
+  _type: 3
+  _power: 10
   _accuracy: 100
   _uses: 10
   _moveEffects:

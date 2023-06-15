@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tackle
   m_EditorClassIdentifier: 
   _moveID: Tackle
-  _description: 
+  _description: The user slams their body into the oponent
   _type: 0
   _power: 50
   _accuracy: 100
@@ -21,14 +21,15 @@ MonoBehaviour:
   _moveEffects:
     _targetStatEffects: []
     _userStatEffects: []
-    TargetPermCondition: 2
+    TargetPermCondition: 0
     ChanceOfTargetPermCondition: 0
     UserPermCondition: 0
     ChanceOfUserPermCondition: 0
     TargetTempCondition: 0
     ChanceOfTargetTempCondition: 0
-    UserTempCondition: 2
+    UserTempCondition: 0
     ChanceOfUserTempCondition: 0
-    WeatherCondition: 2
+    WeatherCondition: 0
     ChanceOfWeatherCondition: 0
   _moveTarget: 0
+  _moveType: 0

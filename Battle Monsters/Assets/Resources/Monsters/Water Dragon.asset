@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b6c88c7a7d4f8d45b6d83edda113942, type: 3}
+  m_Name: Water Dragon
+  m_EditorClassIdentifier: 
+  _species: Water Dragon
+  _model: {fileID: 0}
+  _type1: 2
+  _type2: 0
+  _baseSpeed: 3
+  _baseAttack: 1
+  _baseDefense: 1
+  _maxHealth: 100
+  _moveSet:
+  - {fileID: 11400000, guid: 532a8c959ea426d41890750fa7a52834, type: 2}
+  - {fileID: 11400000, guid: b61b2d25fb67fa54b99186e683fe3fbd, type: 2}
+  - {fileID: 11400000, guid: c5d44dc3fbba9dd48b3f2d51a3185a99, type: 2}
+  - {fileID: 11400000, guid: 233f286bccd0df548a2e6c1f8d6843f8, type: 2}

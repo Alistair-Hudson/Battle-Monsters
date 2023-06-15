@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b6c88c7a7d4f8d45b6d83edda113942, type: 3}
+  m_Name: Forest Dragoin
+  m_EditorClassIdentifier: 
+  _species: Forest Dragoin
+  _model: {fileID: 0}
+  _type1: 3
+  _type2: 0
+  _baseSpeed: 1
+  _baseAttack: 1
+  _baseDefense: 3
+  _maxHealth: 100
+  _moveSet:
+  - {fileID: 11400000, guid: 532a8c959ea426d41890750fa7a52834, type: 2}
+  - {fileID: 11400000, guid: fc1acaa553fe5de41b1325738fa2ff5c, type: 2}
+  - {fileID: 11400000, guid: 5bb28bfa8a63b4d4bbd5c7e5c913f28d, type: 2}
+  - {fileID: 11400000, guid: 5fcefd6c7f9336e4da90f33e344c4aac, type: 2}

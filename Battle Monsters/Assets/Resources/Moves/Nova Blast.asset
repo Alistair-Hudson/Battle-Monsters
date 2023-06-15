@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28ba2a065dc02b246a97f6d9d959f562, type: 3}
-  m_Name: Spit
+  m_Name: Nova Blast
   m_EditorClassIdentifier: 
-  _moveID: Spit
-  _description: Shoots a jet of water the can reduce speed
-  _type: 2
-  _power: 40
-  _accuracy: 100
+  _moveID: Nova Blast
+  _description: The user uses the power of the Sol to blast it's oponent
+  _type: 1
+  _power: 100
+  _accuracy: 50
   _uses: 10
   _moveEffects:
     _targetStatEffects: []
