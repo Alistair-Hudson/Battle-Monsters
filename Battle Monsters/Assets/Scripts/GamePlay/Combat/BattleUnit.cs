@@ -11,13 +11,17 @@ namespace BattleMonsters.GamePlay.Combat
         private bool _isPlayer;
         public bool IsPlayer { get => _isPlayer; }
 
+        private Animator _animator = null;
+        public Animator Animator { get => _animator; }
+
         public GenericMonster Monster { get; set; }
 
         public void Setup(GenericMonster monster)
         {
             //Instanitate Mon
             Monster = monster;
-            Instantiate(monster.Base.Model, transform);
+            GameObject model = Instantiate(monster.Base.Model, transform);
+            _animator = GetComponentInChildren<Animator>();
         }
     }
 }

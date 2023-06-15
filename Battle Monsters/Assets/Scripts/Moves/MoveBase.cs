@@ -25,6 +25,8 @@ namespace BattleMonsters.Moves
         private MoveEffects _moveEffects;
         [SerializeField]
         private MoveTarget _moveTarget;
+        [SerializeField]
+        private MoveType _moveType = MoveType.Melee;
 
         public string MoveID { get => _moveID; }
         public string Description { get => _description; }
@@ -34,6 +36,7 @@ namespace BattleMonsters.Moves
         public int Uses { get => _uses; }
         public MoveEffects Effects { get => _moveEffects; }
         public MoveTarget Target { get => _moveTarget; }
+        public MoveType MoveType { get => _moveType; }
     }
 }
 
@@ -77,4 +80,11 @@ public enum MoveTarget
 {
     Enemy = 0,
     Self
+}
+
+public enum MoveType
+{
+    Melee = 0,
+    Ranged,
+    SelfBuff
 }
