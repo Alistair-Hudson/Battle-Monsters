@@ -1,0 +1,3 @@
+MoveID,Description,Type,Power,Accuracy,Uses
+Fireball,Shoots a fireball at the enemy can leave a burn,Fire,40,100,10
+Poison Spit,Spits poison at the enemy can leave the enemy poisoned,Grass,40,90,10

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ba2a065dc02b246a97f6d9d959f562, type: 3}
+  m_Name: Fireball
+  m_EditorClassIdentifier: 
+  _moveID: Fireball
+  _description: Shoots a fireball at the enemy can leave a burn
+  _type: 1
+  _power: 40
+  _accuracy: 100
+  _uses: 10
+  _moveEffects:
+    _targetStatEffects: []
+    _userStatEffects: []
+    TargetPermCondition: 0
+    ChanceOfTargetPermCondition: 0
+    UserPermCondition: 0
+    ChanceOfUserPermCondition: 0
+    TargetTempCondition: 0
+    ChanceOfTargetTempCondition: 0
+    UserTempCondition: 0
+    ChanceOfUserTempCondition: 0
+    WeatherCondition: 0
+    ChanceOfWeatherCondition: 0
+  _moveTarget: 0
+  _moveType: 0

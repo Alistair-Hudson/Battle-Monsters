@@ -1,5 +1,6 @@
 using BattleMonsters.Utils;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,6 +44,16 @@ namespace BattleMonsters.Moves
         public MoveEffects Effects { get => _moveEffects; }
         public MoveTarget Target { get => _moveTarget; }
         public MoveType MoveType { get => _moveType; }
+
+        public void SetMove(string moveID, string description, string type, string power, string accuracy, string uses)
+        {
+            _moveID = moveID;
+            _description = description;
+            Enum.TryParse(type, out _type);
+            _power = int.Parse(power);
+            _accuracy = int.Parse(accuracy);
+            _uses = int.Parse(uses);
+        }
     }
 }
 
