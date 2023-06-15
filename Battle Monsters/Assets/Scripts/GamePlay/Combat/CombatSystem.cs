@@ -229,8 +229,8 @@ namespace BattleMonsters.GamePlay.Combat
             if (damageDetails.HasFlag(OnHitResult.KO))
             {
                 _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} was knocked out");
-                yield return new WaitForSeconds(_textDelayTime);
                 targetUnit.Animator.SetTrigger("Defeat");
+                yield return new WaitForSeconds(_textDelayTime);
                 ExecuteTargetFainted(targetUnit);
                 yield break;
             }

@@ -35,3 +35,4 @@ MonoBehaviour:
     WeatherCondition: 0
     ChanceOfWeatherCondition: 0
   _moveTarget: 0
+  _moveType: 1

@@ -1,16 +1,22 @@
 using BattleMonsters.Utils;
+using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace BattleMonsters.Moves
 {
     [CreateAssetMenu(fileName = "Move", menuName = "ScriptableObjects/Move")]
+    [InlineEditor]
     public class MoveBase: ScriptableObject
     {
+        [BoxGroup("Basic Info")]
         [SerializeField]
         private string _moveID;
+        [BoxGroup("Basic Info")]
         [SerializeField]
+        [TextArea]
         private string _description;
+
         [SerializeField]
         private Utils.Type _type;
         [SerializeField]
