@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Fire Dragon
   m_EditorClassIdentifier: 
   _species: Fire Dragon
-  _model: {fileID: 0}
+  _model: {fileID: 1317000959904042, guid: 7f51b5e2065bbb145b78b23451c549e0, type: 3}
   _type1: 1
   _type2: 0
   _baseSpeed: 1

@@ -45,14 +45,14 @@ namespace BattleMonsters.Moves
         public MoveTarget Target { get => _moveTarget; }
         public MoveType MoveType { get => _moveType; }
 
-        public void SetMove(string moveID, string description, string type, string power, string accuracy, string uses)
+        public void SetMove(string[] data)
         {
-            _moveID = moveID;
-            _description = description;
-            Enum.TryParse(type, out _type);
-            _power = int.Parse(power);
-            _accuracy = int.Parse(accuracy);
-            _uses = int.Parse(uses);
+            _moveID = data[0];
+            _description = data[1];
+            Enum.TryParse(data[2], out _type);
+            _power = int.Parse(data[3]);
+            _accuracy = int.Parse(data[4]);
+            _uses = int.Parse(data[5]);
         }
     }
 }

@@ -19,11 +19,18 @@ namespace BattleMonsters.Editor
             for (int i = 1; i < lines.Length; i++)
             {
                 string[] line = lines[i].Split(',');
+                MoveBase move = AssetDatabase.LoadAssetAtPath($"Assets/Resources/Moves/{line[0]}.asset", typeof(MoveBase)) as MoveBase;
+                if (move)
+                {
+                    move.SetMove(line);
+                }
+                else
+                {
+                    move = ScriptableObject.CreateInstance<MoveBase>();
+                    move.SetMove(line);
 
-                MoveBase move = ScriptableObject.CreateInstance<MoveBase>();
-                move.SetMove(line[0], line[1], line[2], line[3], line[4], line[5]);
-
-                AssetDatabase.CreateAsset(move, $"Assets/Resources/Moves/{move.MoveID}.asset");
+                    AssetDatabase.CreateAsset(move, $"Assets/Resources/Moves/{move.MoveID}.asset");
+                }
             }
 
             AssetDatabase.SaveAssets();
@@ -38,10 +45,19 @@ namespace BattleMonsters.Editor
             {
                 string[] line = lines[i].Split(',');
 
-                MonsterBase monster = ScriptableObject.CreateInstance<MonsterBase>();
-                monster.SetMonster(line);
+                MonsterBase monster = AssetDatabase.LoadAssetAtPath($"Assets/Resources/Monsters/{line[0]}.asset", typeof(MonsterBase)) as MonsterBase;
+                if (monster)
+                {
+                    monster.SetMonster(line);
+                }
+                else
+                {
 
-                AssetDatabase.CreateAsset(monster, $"Assets/Resources/Monsters/{monster.Species}.asset");
+                    monster = ScriptableObject.CreateInstance<MonsterBase>();
+                    monster.SetMonster(line);
+
+                    AssetDatabase.CreateAsset(monster, $"Assets/Resources/Monsters/{monster.Species}.asset");
+                }
             }
 
             AssetDatabase.SaveAssets();

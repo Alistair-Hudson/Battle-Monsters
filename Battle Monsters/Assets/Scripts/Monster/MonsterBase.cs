@@ -64,6 +64,7 @@ namespace BattleMonsters.Monster
             _baseDefense = int.Parse(data[5]);
             _maxHealth = int.Parse(data[6]);
             _moveSet = new List<MoveBase>();
+            MoveBase move = Resources.Load($"Moves/{data[7]}") as MoveBase;
             _moveSet.Add(Resources.Load($"Moves/{data[7]}") as MoveBase);
             _moveSet.Add(Resources.Load($"Moves/{data[8]}") as MoveBase);
             _moveSet.Add(Resources.Load($"Moves/{data[9]}") as MoveBase);

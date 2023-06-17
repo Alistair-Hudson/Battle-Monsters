@@ -566,6 +566,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5454486082758069851, guid: 96fad12e39839cd459efcd367ad9721f, type: 3}
+      propertyPath: _wildMon._base
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d0c6621aca4d3c4b930bac266a203cf, type: 2}
+    - target: {fileID: 5454486082758069851, guid: 96fad12e39839cd459efcd367ad9721f, type: 3}
+      propertyPath: _playerMon._base
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d28c450484d5b54ebbac19e64477bbf, type: 2}
     - target: {fileID: 6884413825259861944, guid: 96fad12e39839cd459efcd367ad9721f, type: 3}
       propertyPath: m_Name
       value: CombatSystem
