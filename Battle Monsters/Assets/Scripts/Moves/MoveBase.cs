@@ -18,6 +18,12 @@ namespace BattleMonsters.Moves
         [TextArea]
         private string _description;
 
+        [HorizontalGroup("Game Data", 75)]
+        [PreviewField(75)]
+        [HideLabel]
+        [SerializeField]
+        private GameObject _moveVFX = null;
+
         [SerializeField]
         private Utils.Type _type;
         [SerializeField]
@@ -44,6 +50,7 @@ namespace BattleMonsters.Moves
         public MoveEffects Effects { get => _moveEffects; }
         public MoveTarget Target { get => _moveTarget; }
         public MoveType MoveType { get => _moveType; }
+        public GameObject MoveVFX { get => _moveVFX; }
 
         public void SetMove(string[] data)
         {
