@@ -6,16 +6,22 @@ using UnityEngine;
 
 namespace BattleMonsters.Utils
 {
+    public class Node<T>
+    {
+        public T Data;
+        public float Priority;
+    }
+
     public class PriorityQueue<T>
     {
         private bool _isMinFirst;
-        private Dictionary<float, T> _sortedList;
+        private List<Node<T>> _itemList;
 
-        public int Count { get => _sortedList.Count; }
+        public int Count { get => _itemList.Count; }
 
         public PriorityQueue(bool isMinFirst)
         {
-            _sortedList = new Dictionary<float, T>();
+            _itemList = new List<Node<T>>();
             _isMinFirst = isMinFirst;
         }
 
@@ -24,46 +30,60 @@ namespace BattleMonsters.Utils
             Clear();
         }
 
-        public void Enqueue(float key, T value)
+        public void Enqueue(float priority, T data)
         {
-            _sortedList.Add(key, value);
+            Node<T> node = new Node<T> { Data = data, Priority = priority };
+            _itemList.Add(node);
         }
 
         public T Dequeue()
         {
-
-            float firstKey = GetFirstKey();
-            _sortedList.Remove(firstKey, out T value);
-            return value;
+            T data = Peek();
+            Remove(data);
+            return data;
         }
 
         private T Peek()
         {
-            float firstKey = GetFirstKey();
-            return _sortedList[firstKey];
-        }
-
-        private float GetFirstKey()
-        {
-            float[] keys = _sortedList.Keys.ToArray();
+            Node<T> node = _itemList[0];
             if (_isMinFirst)
             {
-                return Mathf.Min(keys);
+                for (int i = 1; i < _itemList.Count; i++)
+                {
+                    if (node.Priority > _itemList[i].Priority)
+                    {
+                        node = _itemList[i];
+                    }
+                }
             }
             else
             {
-                return Mathf.Max(keys);
+                for (int i = 1; i < _itemList.Count; i++)
+                {
+                    if (node.Priority < _itemList[i].Priority)
+                    {
+                        node = _itemList[i];
+                    }
+                }
             }
+            return node.Data;
         }
 
         public void Clear()
         {
-            _sortedList.Clear();
+            _itemList.Clear();
         }
 
-        public bool Remove(float key)
+        public bool Remove(T data)
         {
-            return _sortedList.Remove(key);
+            foreach (var node in _itemList)
+            {
+                if (data.Equals(node.Data))
+                {
+                    return _itemList.Remove(node);
+                }
+            }
+            return false;
         }
     }
 }
