@@ -2,6 +2,7 @@ using BattleMonsters.Monster;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace BattleMonsters.GamePlay.Combat
 {
@@ -12,24 +13,16 @@ namespace BattleMonsters.GamePlay.Combat
         public bool IsPlayer { get => _isPlayer; }
 
         private GenericMonster _monster = null;
-        private Transform _vfxPoint = null;
-        private Animator _animator = null;
-        private AudioSource _audioSource = null;
+        private MonsterModelPassthrough _model = null;
 
         public GenericMonster Monster { get => _monster; }
-        public Transform VFXPoint { get => _vfxPoint; }
-        public Animator Animator { get => _animator; }
-        public AudioSource AudioSource { get => _audioSource; }
+        public MonsterModelPassthrough Model { get => _model; }
 
         public void Setup(GenericMonster monster)
         {
             //Instanitate Mon
             _monster = monster;
-            MonsterModelPassthrough model = Instantiate(monster.Base.Model, transform).gameObject.GetComponent<MonsterModelPassthrough>();
-
-            _vfxPoint = model.VFXPoint;
-            _animator = model.Animator;
-            _audioSource = model.AudioSource;
+            _model = Instantiate(monster.Base.Model, transform).gameObject.GetComponent<MonsterModelPassthrough>();
         }
     }
 }

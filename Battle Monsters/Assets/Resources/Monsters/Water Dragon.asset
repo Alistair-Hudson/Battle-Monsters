@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Water Dragon
   m_EditorClassIdentifier: 
   _species: Water Dragon
-  _model: {fileID: 0}
+  _model: {fileID: 8779290843898357942, guid: 4ecfb37c979ba164a9c4b309d4b86491, type: 3}
   _type1: 2
   _type2: 0
   _baseSpeed: 3

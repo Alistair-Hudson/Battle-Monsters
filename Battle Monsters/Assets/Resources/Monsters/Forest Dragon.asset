@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Forest Dragon
   m_EditorClassIdentifier: 
   _species: Forest Dragoin
-  _model: {fileID: 0}
+  _model: {fileID: 955649529981219134, guid: 2650f599ef430cd4296cecc4e7d03557, type: 3}
   _type1: 3
   _type2: 0
   _baseSpeed: 1

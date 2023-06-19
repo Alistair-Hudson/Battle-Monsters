@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace BattleMonsters.Monster
 {
@@ -16,10 +17,17 @@ namespace BattleMonsters.Monster
         public Animator Animator { get => _animator; }
         public AudioSource AudioSource { get => _audioSource; }
 
+        public UnityEvent AnimationTriggered = new UnityEvent();
+
         private void Awake()
         {
             _animator = GetComponent<Animator>();
             _audioSource = GetComponent<AudioSource>();
+        }
+
+        public void AnimationTrigger()
+        {
+            AnimationTriggered.Invoke();
         }
     }
 }

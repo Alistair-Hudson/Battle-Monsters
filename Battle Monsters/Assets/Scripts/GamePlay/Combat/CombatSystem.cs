@@ -44,6 +44,7 @@ namespace BattleMonsters.GamePlay.Combat
         private float _confusionHurtChance = 0.33f; 
 
         private bool _isPlayerFainted = false;
+        private bool _isProcessComplete = false;
 
         private Utils.Conditions.WeatherCondition _weatherCondition = Utils.Conditions.WeatherCondition.None;
         private int _weatherCountdown = 0;
@@ -74,6 +75,9 @@ namespace BattleMonsters.GamePlay.Combat
             _playerHUD.SetHUDData(_playerUnit.Monster);
             _opponentUnit.Setup(_wildMon);
             _opponentHUD.SetHUDData(_opponentUnit.Monster);
+
+            _playerUnit.Model.AnimationTriggered.AddListener(ContinueCombat);
+            _opponentUnit.Model.AnimationTriggered.AddListener(ContinueCombat);
 
             _dialogBox.SetDialog($"A wild {_opponentUnit.Monster.Base.Species} appeard!");
             yield return new WaitForSeconds(_textDelayTime);
@@ -162,30 +166,33 @@ namespace BattleMonsters.GamePlay.Combat
 
             attack.Uses--;
             _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} used {attack.Base.MoveID}");
+            yield return new WaitForSeconds(_textDelayTime);
             switch (attack.Base.MoveType)
             {
                 case MoveType.Melee:
-                    sourceUnit.Animator.SetTrigger("Melee");
+                    sourceUnit.Model.Animator.SetTrigger("Melee");
                     break;
                 case MoveType.Ranged:
-                    sourceUnit.Animator.SetTrigger("Ranged");
+                    sourceUnit.Model.Animator.SetTrigger("Ranged");
                     break;
                 case MoveType.SelfBuff:
-                    sourceUnit.Animator.SetTrigger("Buff");
+                    sourceUnit.Model.Animator.SetTrigger("Buff");
                     break;
             }
-
-            yield return new WaitForSeconds(_textDelayTime);
+            yield return new WaitUntil(() => _isProcessComplete);
+            _isProcessComplete = false;
 
             if (!CheckHit(attack, sourceUnit, targetUnit))
             {
+                targetUnit.Model.Animator.SetTrigger("Dodge");
+                yield return new WaitUntil(() => _isProcessComplete);
                 _dialogBox.SetDialog($"{sourceUnit.Monster.Base.Species} missed!");
-                targetUnit.Animator.SetTrigger("Dodge");
                 yield return new WaitForSeconds(_textDelayTime);
+                _isProcessComplete = false;
                 yield break;
             }
 
-            targetUnit.Animator.SetTrigger("Hit");
+            targetUnit.Model.Animator.SetTrigger("Hit");
             OnHitResult damageDetails = OnHitResult.None;
             switch (attack.Base.Target)
             {
@@ -229,8 +236,10 @@ namespace BattleMonsters.GamePlay.Combat
             if (damageDetails.HasFlag(OnHitResult.KO))
             {
                 _dialogBox.SetDialog($"{targetUnit.Monster.Base.Species} was knocked out");
-                targetUnit.Animator.SetTrigger("Defeat");
                 yield return new WaitForSeconds(_textDelayTime);
+                targetUnit.Model.Animator.SetTrigger("Defeat");
+                yield return new WaitUntil(() => _isProcessComplete);
+                _isProcessComplete = false;
                 ExecuteTargetFainted(targetUnit);
                 yield break;
             }
@@ -385,6 +394,7 @@ namespace BattleMonsters.GamePlay.Combat
 
         private void ExecuteTargetFainted(BattleUnit targetUnit)
         {
+            _priorityQueue.Remove(targetUnit);
             //exit battle
         }
 
@@ -472,15 +482,20 @@ namespace BattleMonsters.GamePlay.Combat
                 if (stat.Modifier < 0)
                 {
                     _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Stat} was lowered");
-                    unit.Animator.SetTrigger("Debuff");
+                    unit.Model.Animator.SetTrigger("Debuff");
                     yield return new WaitForSeconds(_textDelayTime);
                 }else if (stat.Modifier > 0)
                 {
                     _dialogBox.SetDialog($"{unit.Monster.Base.Species}'s {stat.Stat} was raised");
-                    unit.Animator.SetTrigger("Buff");
+                    unit.Model.Animator.SetTrigger("Buff");
                     yield return new WaitForSeconds(_textDelayTime);
                 }
             }
+        }
+
+        private void ContinueCombat()
+        {
+            _isProcessComplete = true;
         }
     }
 }

@@ -569,7 +569,7 @@ PrefabInstance:
     - target: {fileID: 5454486082758069851, guid: 96fad12e39839cd459efcd367ad9721f, type: 3}
       propertyPath: _wildMon._base
       value: 
-      objectReference: {fileID: 11400000, guid: 3d0c6621aca4d3c4b930bac266a203cf, type: 2}
+      objectReference: {fileID: 11400000, guid: e324c7e9f3f2d92429b7c941d7c779f4, type: 2}
     - target: {fileID: 5454486082758069851, guid: 96fad12e39839cd459efcd367ad9721f, type: 3}
       propertyPath: _playerMon._base
       value: 
