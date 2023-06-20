@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Spit
   _description: Shoots a jet of water the can reduce speed
+  _moveVFX: {fileID: 5788053518618447762, guid: 7fc2bcfd18742394ea20b2f57f057109, type: 3}
   _type: 2
   _power: 40
   _accuracy: 100

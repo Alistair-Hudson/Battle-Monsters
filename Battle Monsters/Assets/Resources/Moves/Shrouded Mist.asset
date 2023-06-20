@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Shrouded Mist
   _description: The user creates a mist the raises its evasion
+  _moveVFX: {fileID: 6057386206599952099, guid: 769cb3618e2a4e04cb769a47ca03cbc7, type: 3}
   _type: 2
   _power: 0
   _accuracy: -1

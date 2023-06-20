@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Nova Burst
   _description: The user uses the flames in its body to raise its attack
+  _moveVFX: {fileID: 3344044341863017928, guid: f6b7f023f55f00948a26d773de41b717, type: 3}
   _type: 1
   _power: 0
   _accuracy: -1

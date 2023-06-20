@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Forest Wind
   _description: By flapping it wings the user greats a small wind that lowers Evasion
+  _moveVFX: {fileID: 6093904818599360807, guid: a6f974856cff75d4a98f5261b4151fcb, type: 3}
   _type: 3
   _power: 10
   _accuracy: 100

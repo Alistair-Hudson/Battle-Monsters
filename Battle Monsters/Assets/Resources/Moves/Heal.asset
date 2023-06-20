@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Heal
   _description: The user calls upon the earth to heal itself
+  _moveVFX: {fileID: 384026505976730013, guid: 999821caa4d627b4dba9108833a3df47, type: 3}
   _type: 3
   _power: 0
   _accuracy: -1
