@@ -181,6 +181,8 @@ namespace BattleMonsters.GamePlay.Combat
             }
             yield return new WaitUntil(() => _isProcessComplete);
             _isProcessComplete = false;
+            GameObject attackVFX = Instantiate(attack.Base.MoveVFX, sourceUnit.Model.VFXPoint);
+
 
             if (!CheckHit(attack, sourceUnit, targetUnit))
             {
@@ -200,7 +202,7 @@ namespace BattleMonsters.GamePlay.Combat
                     damageDetails = targetUnit.Monster.ReceiveDamage(attack, sourceUnit.Monster);
                     break;
                 case MoveTarget.Self:
-                    damageDetails = targetUnit.Monster.ReceiveDamage(attack, sourceUnit.Monster);
+                    //damageDetails = sourceUnit.Monster.ReceiveDamage(attack, sourceUnit.Monster);
                     break;
                 default:
                     break;

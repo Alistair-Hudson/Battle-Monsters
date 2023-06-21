@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Poison Spit
   _description: Spits poison at the enemy can leave the enemy poisoned
+  _moveVFX: {fileID: 4081947996268971911, guid: f1dae95df37f7ce4ca111b5ac195e31c, type: 3}
   _type: 3
   _power: 40
   _accuracy: 90

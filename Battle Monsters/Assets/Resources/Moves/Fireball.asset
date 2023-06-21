@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Fireball
   _description: Shoots a fireball at the enemy can leave a burn
+  _moveVFX: {fileID: 8852744862711911490, guid: cb57df2e2247a1348926d6301e4c5d77, type: 3}
   _type: 1
   _power: 40
   _accuracy: 100

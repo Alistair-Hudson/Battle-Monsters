@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Tackle
   _description: The user slams their body into the oponent
+  _moveVFX: {fileID: 7936408781543234856, guid: 285c8358430e09140be05ccc6dc8aead, type: 3}
   _type: 0
   _power: 50
   _accuracy: 100

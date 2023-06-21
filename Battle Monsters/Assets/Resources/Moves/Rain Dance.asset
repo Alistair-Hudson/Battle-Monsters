@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveID: Rain Dance
   _description: The user dances about to bring about a rain cloud
+  _moveVFX: {fileID: 5385344404439028670, guid: 2e2e720a814d64241b0a3ecf639aabc5, type: 3}
   _type: 2
   _power: 0
   _accuracy: -1
